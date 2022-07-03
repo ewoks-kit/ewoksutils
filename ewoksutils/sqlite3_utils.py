@@ -36,7 +36,7 @@ def python_to_sql_types(field_types: Dict) -> dict:
 
 
 def serialize(value: Any, sql_type: Optional[str] = None):
-    if value is not None:
+    if value is not None and sql_type is not None:
         vsql_type = python_to_sql_type(value)
         if sql_type != vsql_type:
             raise TypeError(f"value {value} does not have SQL type {sql_type}")
