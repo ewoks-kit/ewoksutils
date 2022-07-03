@@ -1,7 +1,8 @@
 from numbers import Integral, Real
 import json
 from datetime import datetime
-from typing import Any, Dict, Iterator
+from typing import Any, Dict, Iterator, Union, Optional
+import sqlite3
 from .datetime_utils import fromisoformat
 
 
@@ -30,15 +31,15 @@ def python_to_sql_type(value: Any) -> str:
         return "BLOB"
 
 
-def python_to_sql_types(data: Dict) -> str:
-    return {k: python_to_sql_type(v) for k, v in data.items()}
+def python_to_sql_types(field_types: Dict) -> dict:
+    return {k: python_to_sql_type(v) for k, v in field_types.items()}
 
 
-def serialize(value, sql_type: str):
+def serialize(value: Any, sql_type: Optional[str] = None):
     if value is not None:
         vsql_type = python_to_sql_type(value)
         if sql_type != vsql_type:
-            raise TypeError("wrong SQL type")
+            raise TypeError(f"value {value} does not have SQL type {sql_type}")
     if isinstance(value, (Integral, Real, bool, str)):
         return value
     elif isinstance(value, datetime):
@@ -47,32 +48,42 @@ def serialize(value, sql_type: str):
         return json.dumps(value).encode()
 
 
-def deserialize(value, python_type):
-    if value == b"null":
+def _select_serialize(value: Any, sql_type: Optional[str] = None):
+    sql_value = serialize(value, sql_type)
+    if isinstance(sql_value, str):
+        return f"'{sql_value}'"
+    return sql_value
+
+
+def deserialize(sql_value, field_type: Optional[str] = None):
+    if sql_value == b"null":
         return None
-    elif isinstance(python_type, bool):
-        return bool(value)
-    elif isinstance(python_type, (Integral, Real, str)):
-        return value
-    elif isinstance(python_type, datetime):
-        return fromisoformat(value)
+    elif isinstance(field_type, bool):
+        return bool(sql_value)
+    elif isinstance(field_type, (Integral, Real, str)):
+        return sql_value
+    elif isinstance(field_type, datetime):
+        return fromisoformat(sql_value)
     else:
-        return json.loads(value.decode())
+        return json.loads(sql_value.decode())
 
 
 def select(
     conn,
-    field_types: Dict,
-    sql_types: Dict,
-    starttime=None,
-    endtime=None,
+    table: str,
+    field_types: Optional[Dict] = None,
+    sql_types: Optional[Dict] = None,
+    starttime: Optional[Union[str, datetime]] = None,
+    endtime: Optional[Union[str, datetime]] = None,
     **is_equal_filter,
 ) -> Iterator[dict]:
     cursor = conn.cursor()
-
     if is_equal_filter:
+        if sql_types is None:
+            sql_types = python_to_sql_types(field_types)
         conditions = [
-            f"{k} = {serialize(v, sql_types[k])}" for k, v in is_equal_filter.items()
+            f"{k} = {_select_serialize(v, sql_types.get(k))}"
+            for k, v in is_equal_filter.items()
         ]
     else:
         conditions = list()
@@ -89,14 +100,22 @@ def select(
 
     if conditions:
         conditions = " AND ".join(conditions)
-        query = f"SELECT * FROM test WHERE {conditions}"
+        query = f"SELECT * FROM {table} WHERE {conditions}"
     else:
-        query = "SELECT * FROM test"
+        query = f"SELECT * FROM {table}"
 
-    cursor.execute(query)
+    try:
+        cursor.execute(query)
+    except sqlite3.OperationalError as e:
+        if "no such table" in str(e):
+            return
+
     rows = cursor.fetchall()
     conn.commit()
 
+    if cursor.description is None:
+        return
+
     fields = [col[0] for col in cursor.description]
     for values in rows:
-        yield {k: deserialize(v, field_types[k]) for k, v in zip(fields, values)}
+        yield {k: deserialize(v, field_types.get(k)) for k, v in zip(fields, values)}

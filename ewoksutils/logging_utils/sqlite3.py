@@ -10,9 +10,9 @@ Sqlite3RecordType = List[Any]
 
 
 class Sqlite3Handler(ConnectionHandler):
-    def __init__(self, uri: str, table: str, fields: Dict):
+    def __init__(self, uri: str, table: str, field_types: Dict):
         self._uri = uri
-        self._field_sql_types = sqlite3_utils.python_to_sql_types(fields)
+        self._field_sql_types = sqlite3_utils.python_to_sql_types(field_types)
         self._ensure_table_query = sqlite3_utils.ensure_table_query(
             table, self._field_sql_types
         )

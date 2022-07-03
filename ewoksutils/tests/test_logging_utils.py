@@ -4,6 +4,8 @@ import logging
 from logging.handlers import QueueHandler
 from queue import Queue
 
+from ewoksutils.sqlite3_utils import select
+
 from ..logging_utils.connection import ConnectionHandler
 from ..logging_utils.sqlite3 import Sqlite3Handler
 from ..logging_utils.asyncwrapper import AsyncHandlerWrapper
@@ -112,22 +114,22 @@ def test_connection_handler():
 def test_sqlite3_handler(tmpdir):
     logger = logging.getLogger(__name__)
     uri = str(tmpdir / "test.db")
-    fields = {"field1": 0, "field2": ""}
-    handler = Sqlite3Handler(uri, "mytable", fields)
+    field_types = {"field1": 0, "field2": ""}
+    handler = Sqlite3Handler(uri, "mytable", field_types)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
     handler.setLevel(logging.INFO)
 
     expected = list()
     logger.info("message1")
-    expected.append((b"null", b"null"))
+    expected.append({"field1": None, "field2": None})
     logger.info("message2", extra={"field2": "2"})
-    expected.append((b"null", "2"))
+    expected.append({"field1": None, "field2": "2"})
     logger.info("message2", extra={"field1": 1, "field2": "2"})
-    expected.append((1, "2"))
+    expected.append({"field1": 1, "field2": "2"})
 
     with sqlite3.connect(uri, uri=True, check_same_thread=False) as conn:
-        rows = list(conn.cursor().execute("SELECT * FROM mytable"))
+        rows = list(select(conn, "mytable", field_types=field_types))
 
     assert rows == expected
 
