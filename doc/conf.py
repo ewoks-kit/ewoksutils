@@ -9,7 +9,6 @@ author = "ESRF"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinxcontrib.mermaid",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
