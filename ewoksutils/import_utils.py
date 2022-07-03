@@ -23,3 +23,8 @@ def import_method(qualname):
     if not callable(method):
         raise RuntimeError(repr(qualname) + " is not callable")
     return method
+
+
+def instantiate_class(class_name: str, *args, **kwargs):
+    cls = import_qualname(class_name)
+    return cls(*args, **kwargs)
