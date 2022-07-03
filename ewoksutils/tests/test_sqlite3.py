@@ -14,10 +14,10 @@ def test_sqlite3_types():
         "dict": dict(),
         "time": datetime.datetime.now(),
     }
-    sql_field_types = sqlite3_utils.python_to_sql_types(field_types)
+    sql_types = sqlite3_utils.python_to_sql_types(field_types)
 
     with sqlite3.connect(":memory:") as conn:
-        query = sqlite3_utils.ensure_table_query(table, sql_field_types)
+        query = sqlite3_utils.ensure_table_query(table, sql_types)
         conn.execute(query)
         conn.commit()
 
@@ -34,8 +34,7 @@ def test_sqlite3_types():
             "time": dt1,
         }
         row = [
-            sqlite3_utils.serialize(v, sql_field_types[k])
-            for k, v in field_values1.items()
+            sqlite3_utils.serialize(v, sql_types[k]) for k, v in field_values1.items()
         ]
         conn.execute(query, row)
 
@@ -50,27 +49,14 @@ def test_sqlite3_types():
             "time": dt2,
         }
         row = [
-            sqlite3_utils.serialize(v, sql_field_types[k])
-            for k, v in field_values2.items()
+            sqlite3_utils.serialize(v, sql_types[k]) for k, v in field_values2.items()
         ]
         conn.execute(query, row)
         conn.commit()
 
-        rows = list(sqlite3_utils.select(conn, field_types, sql_field_types))
-        assert len(rows) == 2
-        assert rows[0] == field_values1
-        assert rows[1] == field_values2
-
-        rows = list(sqlite3_utils.select(conn, field_types, sql_field_types, num=30))
-        assert len(rows) == 0
-
-        rows = list(sqlite3_utils.select(conn, field_types, sql_field_types, num=20))
-        assert len(rows) == 1
-        assert rows[0] == field_values2
-
         rows = list(
             sqlite3_utils.select(
-                conn, field_types, sql_field_types, starttime=dt1, endtime=dt2
+                conn, "test", field_types=field_types, sql_types=sql_types
             )
         )
         assert len(rows) == 2
@@ -80,8 +66,46 @@ def test_sqlite3_types():
         rows = list(
             sqlite3_utils.select(
                 conn,
-                field_types,
-                sql_field_types,
+                "test",
+                field_types=field_types,
+                sql_types=sql_types,
+                num=30,
+            )
+        )
+        assert len(rows) == 0
+
+        rows = list(
+            sqlite3_utils.select(
+                conn,
+                "test",
+                field_types=field_types,
+                sql_types=sql_types,
+                num=20,
+            )
+        )
+        assert len(rows) == 1
+        assert rows[0] == field_values2
+
+        rows = list(
+            sqlite3_utils.select(
+                conn,
+                "test",
+                field_types=field_types,
+                sql_types=sql_types,
+                starttime=dt1,
+                endtime=dt2,
+            )
+        )
+        assert len(rows) == 2
+        assert rows[0] == field_values1
+        assert rows[1] == field_values2
+
+        rows = list(
+            sqlite3_utils.select(
+                conn,
+                "test",
+                field_types=field_types,
+                sql_types=sql_types,
                 starttime=dt1 + datetime.timedelta(seconds=1),
             )
         )
@@ -91,8 +115,9 @@ def test_sqlite3_types():
         rows = list(
             sqlite3_utils.select(
                 conn,
-                field_types,
-                sql_field_types,
+                "test",
+                field_types=field_types,
+                sql_types=sql_types,
                 endtime=dt2 - datetime.timedelta(seconds=1),
             )
         )
@@ -102,8 +127,9 @@ def test_sqlite3_types():
         rows = list(
             sqlite3_utils.select(
                 conn,
-                field_types,
-                sql_field_types,
+                "test",
+                field_types=field_types,
+                sql_types=sql_types,
                 starttime=dt2 + datetime.timedelta(seconds=1),
             )
         )

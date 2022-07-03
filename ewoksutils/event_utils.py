@@ -1,4 +1,4 @@
-FIELDS = {
+FIELD_TYPES = {
     "host_name": "",
     "process_id": 0,
     "user_name": "",
