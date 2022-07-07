@@ -56,7 +56,9 @@ def _select_serialize(value: Any, sql_type: Optional[str] = None):
 
 
 def deserialize(sql_value, field_type: Optional[str] = None):
-    if sql_value == b"null":
+    if isinstance(sql_value, bytes):
+        sql_value = sql_value.decode()
+    if sql_value == "null" or sql_value is None:
         return None
     elif isinstance(field_type, bool):
         return bool(sql_value)
@@ -65,7 +67,7 @@ def deserialize(sql_value, field_type: Optional[str] = None):
     elif isinstance(field_type, datetime):
         return fromisoformat(sql_value)
     else:
-        return json.loads(sql_value.decode())
+        return json.loads(sql_value)
 
 
 def select(
