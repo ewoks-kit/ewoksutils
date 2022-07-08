@@ -5,13 +5,13 @@
 ## Install
 
 ```bash
-python -m pip install ewoksutils[test]
+python3 -m pip install ewoksutils[test]
 ```
 
 ## Test
 
 ```bash
-pytest --pyargs ewoksutils.tests
+python3 -m pytest --pyargs ewoksutils.tests
 ```
 
 ## Documentation
