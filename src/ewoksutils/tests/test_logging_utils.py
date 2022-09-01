@@ -114,7 +114,7 @@ def test_connection_handler():
 def test_sqlite3_handler(tmpdir):
     logger = logging.getLogger(__name__)
     uri = str(tmpdir / "test.db")
-    field_types = {"field1": 0, "field2": ""}
+    field_types = {"field1": 0, "field2": "", "field3": True, "field4": 0.0}
     handler = Sqlite3Handler(uri, "mytable", field_types)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
@@ -122,16 +122,25 @@ def test_sqlite3_handler(tmpdir):
 
     expected = list()
     logger.info("message1")
-    expected.append({"field1": None, "field2": None})
+    expected.append({"field1": None, "field2": None, "field3": None, "field4": None})
     logger.info("message2", extra={"field2": "2"})
-    expected.append({"field1": None, "field2": "2"})
-    logger.info("message2", extra={"field1": 1, "field2": "2"})
-    expected.append({"field1": 1, "field2": "2"})
+    expected.append({"field1": None, "field2": "2", "field3": None, "field4": None})
+    logger.info(
+        "message2", extra={"field1": 1, "field2": "2", "field3": True, "field4": 1.1}
+    )
+    expected.append({"field1": 1, "field2": "2", "field3": True, "field4": 1.1})
 
     with sqlite3.connect(uri, uri=True, check_same_thread=False) as conn:
         rows = list(select(conn, "mytable", field_types=field_types))
 
     assert rows == expected
+
+    types = {"field1": int, "field2": str, "field3": bool, "field4": float}
+    for row in rows:
+        for name, value in row.items():
+            if value is not None:
+                vtype = types[name]
+                assert isinstance(value, vtype), name
 
     cleanup_logger(__name__)
 
