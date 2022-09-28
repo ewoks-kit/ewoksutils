@@ -1,5 +1,5 @@
 include:
-  - remote: https://gitlab.esrf.fr/workflow/ewoks/ewoks/raw/main/.gitlab-ci-template.yml
+  - remote: https://gitlab.esrf.fr/workflow/ewoks/ewoksci/raw/main/.gitlab-ci-template.yml
 
 test-3.6:
   extends: .test-3.6
