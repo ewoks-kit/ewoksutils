@@ -44,7 +44,7 @@ class ConnectionHandler(logging.Handler):
             return True
         now = time.time()
         if self._retry_time is not None and now < self._retry_time:
-            return
+            return False
         self._connect()
         if self._connected():
             # Connection succeeded: no delay for next connection attempt
