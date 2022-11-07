@@ -1,10 +1,11 @@
 import logging
 import logging.handlers
+import queue
 
 
 def cleanup_logger(name: str):
     """Cleanup and delete a global python logger"""
-    logging._acquireLock()
+    logging._acquireLock()  # type: ignore
     try:
         # Remove reference from root
         logger = logging.root.manager.loggerDict.pop(name, None)
@@ -26,7 +27,7 @@ def cleanup_logger(name: str):
         # Remove local reference
         del logger
     finally:
-        logging._releaseLock()
+        logging._releaseLock()  # type: ignore
 
 
 def _cleanup_logger_instance(logger: logging.Logger):
@@ -36,7 +37,8 @@ def _cleanup_logger_instance(logger: logging.Logger):
             handler.acquire()
             try:
                 q = handler.queue
-                with q.mutex:
-                    q.queue.clear()
+                if isinstance(q, queue.Queue):
+                    with q.mutex:
+                        q.queue.clear()
             finally:
                 handler.release()

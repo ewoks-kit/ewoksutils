@@ -10,8 +10,8 @@ def ensure_table_query(table: str, field_sql_types: Dict[str, str]) -> str:
     s = f"CREATE TABLE IF NOT EXISTS {table}"
     if not field_sql_types:
         return s
-    columns = [f"{k} {v}" for k, v in field_sql_types.items()]
-    columns = ", ".join(columns)
+    lst = [f"{k} {v}" for k, v in field_sql_types.items()]
+    columns = ", ".join(lst)
     return f"{s} ({columns})"
 
 
@@ -31,7 +31,9 @@ def python_to_sql_type(value: Any) -> str:
         return "BLOB"
 
 
-def python_to_sql_types(field_types: Dict) -> dict:
+def python_to_sql_types(field_types: Optional[Dict]) -> dict:
+    if not field_types:
+        return dict()
     return {k: python_to_sql_type(v) for k, v in field_types.items()}
 
 
@@ -101,8 +103,8 @@ def select(
         conditions.append(f"time <= '{endtime.isoformat()}'")
 
     if conditions:
-        conditions = " AND ".join(conditions)
-        query = f"SELECT * FROM {table} WHERE {conditions}"
+        search_condition = " AND ".join(conditions)
+        query = f"SELECT * FROM {table} WHERE {search_condition}"
     else:
         query = f"SELECT * FROM {table}"
 
@@ -119,5 +121,7 @@ def select(
         return
 
     fields = [col[0] for col in cursor.description]
+    if field_types is None:
+        field_types = dict()
     for values in rows:
         yield {k: deserialize(v, field_types.get(k)) for k, v in zip(fields, values)}
