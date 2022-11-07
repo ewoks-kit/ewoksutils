@@ -1,6 +1,7 @@
 import logging
 from queue import Queue, Empty
 from logging.handlers import QueueHandler, QueueListener
+from typing import Any
 
 
 class AsyncHandlerWrapper(QueueHandler):
@@ -10,7 +11,7 @@ class AsyncHandlerWrapper(QueueHandler):
     """
 
     def __init__(self, handler: logging.Handler):
-        queue = Queue()
+        queue: Queue[Any] = Queue()
         self._listener = QueueListener(queue, handler, respect_handler_level=True)
         self._listener.start()
         super().__init__(queue)

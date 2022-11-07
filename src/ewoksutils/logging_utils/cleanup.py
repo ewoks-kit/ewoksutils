@@ -1,5 +1,6 @@
 import logging
 import logging.handlers
+import queue
 
 
 def cleanup_logger(name: str):
@@ -36,7 +37,8 @@ def _cleanup_logger_instance(logger: logging.Logger):
             handler.acquire()
             try:
                 q = handler.queue
-                with q.mutex:
-                    q.queue.clear()
+                if isinstance(q, queue.Queue):
+                    with q.mutex:
+                        q.queue.clear()
             finally:
                 handler.release()
