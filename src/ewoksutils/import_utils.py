@@ -1,3 +1,4 @@
+import sys
 import importlib
 
 
@@ -11,7 +12,14 @@ def import_qualname(qualname):
     module_name, dot, obj_name = qualname.rpartition(".")
     if not module_name:
         raise ImportError(f"cannot import {qualname}")
+
+    if "" not in sys.path:
+        # This happens when the python process was launched
+        # through a python console script
+        sys.path.append("")
+
     module = importlib.import_module(module_name)
+
     try:
         return getattr(module, obj_name)
     except AttributeError:
