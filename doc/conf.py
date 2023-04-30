@@ -1,10 +1,10 @@
-"""rm -rf doc/_generated/; python setup.py build_sphinx -E -a
+"""rm -rf doc/_generated/; sphinx-build doc build/sphinx/html -E -a
 """
 
 from typing import List
 
 project = "ewoksutils"
-release = "0.1"
+version = "0.1"
 copyright = "2021, ESRF"
 author = "ESRF"
 
