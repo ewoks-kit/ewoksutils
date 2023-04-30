@@ -1,4 +1,4 @@
-ewoksutils |release|
+ewoksutils |version|
 ====================
 
 *ewoksutils* provides utilities for `ewoks <https://ewoks.readthedocs.io/>`_ developers.
