@@ -9,11 +9,11 @@ def qualname(obj):
 
 
 def import_module(module_name: str, reload: bool = False) -> ModuleType:
-    not_loaded = module_name not in sys.modules
+    already_loaded = module_name in sys.modules
     mod = importlib.import_module(module_name)
-    if not_loaded or not reload:
-        return mod
-    return importlib.reload(mod)
+    if already_loaded and reload:
+        return importlib.reload(mod)
+    return mod
 
 
 def import_qualname(qualname, reload: bool = False) -> Any:
