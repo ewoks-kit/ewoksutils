@@ -3,7 +3,7 @@ FIELD_TYPES = {
     "process_id": 0,
     "user_name": "",
     "job_id": "",
-    "binding": "",
+    "engine": "",
     "context": "",
     "workflow_id": "",
     "type": "",
