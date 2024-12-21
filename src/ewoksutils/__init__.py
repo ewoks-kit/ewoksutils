@@ -1,1 +1,6 @@
-__version__ = "1.1.0rc1"
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("ewoksutils")
+except PackageNotFoundError:
+    __version__ = "unknown"
