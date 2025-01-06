@@ -35,7 +35,7 @@ dev = [
 doc = [
     "sphinx >=4.5",
     "sphinx-autodoc-typehints >=1.16",
-    "pydata-sphinx-theme < 0.15",
+    "pydata-sphinx-theme",
 ]
 
 [tool.setuptools]
