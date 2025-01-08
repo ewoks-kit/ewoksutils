@@ -11,9 +11,11 @@ def task_inputs(
     task_identifier: Optional[str] = None,
     inputs: Optional[Mapping] = None,
 ) -> List[dict]:
-    """Convert a {name: value} dict of inputs to a list of workflow inputs for given tasks.
+    """Convert a {name: value} dict of inputs to a list of workflow
+    inputs for given tasks.
 
-    Provide one of ``id``, ``label`` and ``task_identifier`` to select the targeted tasks.
+    Provide one of ``id``, ``label`` and ``task_identifier`` to select
+    the targeted tasks.
 
     .. code:: python
 
