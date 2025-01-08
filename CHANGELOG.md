@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.1.0
+
+New features:
+
+- `ewoksutils.task_utils.task_inputs` create ewoks task inputs from a dictionary
+
 ## 1.0.0
 
 Breaking changes:

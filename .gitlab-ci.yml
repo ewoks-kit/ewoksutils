@@ -1,6 +1,7 @@
 include:
-  - project: workflow/ewoksadmin/ewoksci
+  - project: dau/ci/pyci
     file: .gitlab-ci-template.yml
+    ref: add_pypi_release_and_tag
 
 test-3.6:
   extends: .test-3.6
@@ -25,6 +26,12 @@ test_sdist-3.8-win:
 
 build_doc:
   extends: .build_doc
+
+pypi:
+  extends: .pypi
+
+testpypi:
+  extends: .testpypi
 
 pages:
   extends: .pages
