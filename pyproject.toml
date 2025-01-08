@@ -1,5 +1,52 @@
 [build-system]
-requires = [
-    "setuptools>=46.4"
-]
+requires = ["setuptools>=46.4"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "ewoksutils"
+version = "1.1.0rc1"
+authors = [{name = "ESRF", email = "dau-pydev@esrf.fr"}]
+description = "Utilities for ewoks developers"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE.md"}
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/"
+Documentation = "https://ewoksutils.readthedocs.io/"
+Repository = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/"
+Issues = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/issues/"
+Changelog = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/-/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = [
+    "pytest >=7",
+]
+dev = [
+    "pytest >=7",
+    "black >=22",
+    "flake8 >=4",
+]
+doc = [
+    "sphinx >=4.5",
+    "sphinx-autodoc-typehints >=1.16",
+    "pydata-sphinx-theme",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.coverage.run]
+omit = ["setup.py", "*/tests/*"]
+
+[[tool.mypy.overrides]]
+module = "setuptools.*"
+ignore_missing_imports = true
