@@ -4,11 +4,13 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-from ewoksutils import __version__ as release
+from importlib.metadata import version as get_version
+
+release = get_version("ewoksutils")
 
 project = "ewoksutils"
 version = ".".join(release.split(".")[:2])
-copyright = "2021-2024, ESRF"
+copyright = "2021-2025, ESRF"
 author = "ESRF"
 docstitle = f"{project} {version}"
 
