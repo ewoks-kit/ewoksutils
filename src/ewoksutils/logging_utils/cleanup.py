@@ -1,12 +1,22 @@
 import logging
 import logging.handlers
 import queue
+from typing import Generator
+from contextlib import contextmanager
+
+
+@contextmanager
+def protect_logging_state() -> Generator[None, None, None]:
+    """A context manager for thread-safe and fork-safe access to
+    global logging data structures. It can be used recursively.
+    """
+    with logging._lock:
+        yield
 
 
 def cleanup_logger(name: str):
     """Cleanup and delete a global python logger"""
-    logging._acquireLock()  # type: ignore
-    try:
+    with protect_logging_state():
         # Remove reference from root
         logger = logging.root.manager.loggerDict.pop(name, None)
         if not isinstance(logger, logging.Logger):
@@ -26,8 +36,6 @@ def cleanup_logger(name: str):
             cleanup_logger(child)
         # Remove local reference
         del logger
-    finally:
-        logging._releaseLock()  # type: ignore
 
 
 def _cleanup_logger_instance(logger: logging.Logger):
