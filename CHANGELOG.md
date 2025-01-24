@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 1.2.0
+
+New features:
+
+- Context manager `ewoksutils.logging_utils.cleanup.protect_logging_state` to support
+  thread-safe and fork-safe access to global logging data structures.
+
+- Support for Python 3.13.
+
 ## 1.1.0
 
 New features:
