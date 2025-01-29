@@ -29,7 +29,7 @@ test = [
 ]
 dev = [
     "pytest >=7",
-    "black >=22",
+    "black >=25",
     "flake8 >=4",
 ]
 doc = [
