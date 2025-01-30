@@ -1,2 +1,1 @@
-"""Custom logging handlers for ewoks
-"""
+"""Custom logging handlers for ewoks"""
