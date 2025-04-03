@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+New features:
+
+- Add decorator `@deprecated` to mark deprecated functions/method.
+
 ## 1.2.0
 
 New features:
