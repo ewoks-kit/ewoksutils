@@ -18,7 +18,7 @@ test_sdist-3.8-win:
   extends: .test_sdist-3.8-win
 
 test_sdist-3.9:
-  extends: .test_sdist-3.13
+  extends: .test_sdist-3.9
 
 test_sdist-3.13:
   extends: .test_sdist-3.13
