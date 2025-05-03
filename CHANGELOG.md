@@ -1,5 +1,13 @@
 # CHANGELOG.md
 
+## Unreleased
+
+## 1.3.1
+
+Bug fixes:
+
+- `cleanup_logger` should close all handlers.
+
 ## 1.3.0
 
 New features:
