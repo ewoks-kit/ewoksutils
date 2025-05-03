@@ -50,3 +50,4 @@ def _cleanup_logger_instance(logger: logging.Logger):
                         q.queue.clear()
             finally:
                 handler.release()
+        handler.close()
