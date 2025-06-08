@@ -1,6 +1,7 @@
 import time
 import logging
 from typing import Any
+from abc import abstractmethod
 
 
 class ConnectionHandler(logging.Handler):
@@ -20,21 +21,25 @@ class ConnectionHandler(logging.Handler):
         self._retry_max = 30.0
         self._retry_factor = 2.0
 
+    @abstractmethod
     def _connect(self, timeout=1) -> None:
         """This is called when no connection exists."""
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def _disconnect(self) -> None:
         """This is called when a connection exists and is connected."""
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def _serialize_record(self, record: logging.LogRecord) -> Any:
         """Convert a record to something that can be given to the connection."""
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def _send_serialized_record(self, srecord: Any):
         """Send the output from `_serialize_record` to the connection."""
-        raise NotImplementedError
+        pass
 
     def _connected(self) -> bool:
         return self._connection is not None
