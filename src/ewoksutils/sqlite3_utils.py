@@ -1,9 +1,11 @@
 from numbers import Integral, Real
 import json
 from datetime import datetime
-from typing import Any, Dict, Iterator, Union, Optional
+from typing import Any, Dict, Iterator, Union, Optional, Generator
 import sqlite3
 from contextlib import closing
+from contextlib import contextmanager
+
 from .datetime_utils import fromisoformat
 
 
@@ -132,3 +134,7 @@ def select(
             }
 
 
+@contextmanager
+def connect(*args, **kwargs) -> Generator[sqlite3.Connection, None, None]:
+    with closing(sqlite3.connect(*args, **kwargs)) as conn:
+        yield conn

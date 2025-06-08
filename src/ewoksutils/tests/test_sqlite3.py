@@ -1,5 +1,5 @@
-import sqlite3
 import datetime
+
 from .. import sqlite3_utils
 
 
@@ -16,7 +16,7 @@ def test_sqlite3_types():
     }
     sql_types = sqlite3_utils.python_to_sql_types(field_types)
 
-    with sqlite3.connect(":memory:") as conn:
+    with sqlite3_utils.connect(":memory:") as conn:
         query = sqlite3_utils.ensure_table_query(table, sql_types)
         conn.execute(query)
         conn.commit()

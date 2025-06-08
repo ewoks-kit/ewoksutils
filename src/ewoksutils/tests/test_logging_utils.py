@@ -1,11 +1,9 @@
 import gc
-import sqlite3
 import logging
 from logging.handlers import QueueHandler
 from queue import Queue
 
-from ewoksutils.sqlite3_utils import select
-
+from .. import sqlite3_utils
 from ..logging_utils.connection import ConnectionHandler
 from ..logging_utils.sqlite3 import Sqlite3Handler
 from ..logging_utils.asyncwrapper import AsyncHandlerWrapper
@@ -130,8 +128,8 @@ def test_sqlite3_handler(tmpdir):
     )
     expected.append({"field1": 1, "field2": "2", "field3": True, "field4": 1.1})
 
-    with sqlite3.connect(uri, uri=True, check_same_thread=False) as conn:
-        rows = list(select(conn, "mytable", field_types=field_types))
+    with sqlite3_utils.connect(uri, uri=True, check_same_thread=False) as conn:
+        rows = list(sqlite3_utils.select(conn, "mytable", field_types=field_types))
 
     assert rows == expected
 

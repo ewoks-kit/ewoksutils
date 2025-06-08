@@ -50,7 +50,11 @@ class Sqlite3Handler(ConnectionHandler):
         return lst
 
     def _sql_query(
-        self, sql: str, parameters: Sequence = tuple(), conn=None, timeout=1
+        self,
+        sql: str,
+        parameters: Sequence = tuple(),
+        conn: Optional[sqlite3.Connection] = None,
+        timeout=1,
     ) -> None:
         if conn is None:
             conn = self._connection
