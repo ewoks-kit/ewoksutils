@@ -19,24 +19,30 @@ class Sqlite3Handler(ConnectionHandler):
         self._insert_row_query = sqlite3_utils.insert_query(
             table, len(self._field_sql_types)
         )
+        self._connection_context = None
         super().__init__()
 
     def _connect(self, timeout=1) -> None:
-        conn = None
+        if self._connection is not None:
+            raise RuntimeError("Already connected")
+        ctx = None
         try:
-            conn = sqlite3.connect(
+            ctx = sqlite3_utils.connect(
                 self._uri, timeout=timeout, uri=True, check_same_thread=False
             )
+            conn = ctx.__enter__()
             self._sql_query(self._ensure_table_query, conn=conn)
         except (OSError, TimeoutError):
-            if conn is not None:
-                conn.close()
+            if ctx is not None:
+                ctx.__exit__(None, None, None)
             self._connection = None
+            self._connection_context = None
         else:
             self._connection = conn
+            self._connection_context = ctx
 
     def _disconnect(self) -> None:
-        self._connection.close()
+        self._connection_context.__exit__(None, None, None)
 
     def _send_serialized_record(self, values: Optional[Sqlite3RecordType]):
         if values:
