@@ -22,12 +22,15 @@ class Sqlite3Handler(ConnectionHandler):
         super().__init__()
 
     def _connect(self, timeout=1) -> None:
+        conn = None
         try:
             conn = sqlite3.connect(
                 self._uri, timeout=timeout, uri=True, check_same_thread=False
             )
             self._sql_query(self._ensure_table_query, conn=conn)
         except (OSError, TimeoutError):
+            if conn is not None:
+                conn.close()
             self._connection = None
         else:
             self._connection = conn
