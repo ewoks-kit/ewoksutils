@@ -1,8 +1,11 @@
 from numbers import Integral, Real
 import json
 from datetime import datetime
-from typing import Any, Dict, Iterator, Union, Optional
+from typing import Any, Dict, Iterator, Union, Optional, Generator
 import sqlite3
+from contextlib import closing
+from contextlib import contextmanager
+
 from .datetime_utils import fromisoformat
 
 
@@ -81,7 +84,6 @@ def select(
     endtime: Optional[Union[str, datetime]] = None,
     **is_equal_filter,
 ) -> Iterator[dict]:
-    cursor = conn.cursor()
     if is_equal_filter:
         if sql_types is None:
             sql_types = python_to_sql_types(field_types)
@@ -108,20 +110,31 @@ def select(
     else:
         query = f"SELECT * FROM {table}"
 
-    try:
-        cursor.execute(query)
-    except sqlite3.OperationalError as e:
-        if "no such table" in str(e):
+    with closing(conn.cursor()) as cursor:
+        try:
+            cursor.execute(query)
+        except sqlite3.OperationalError as e:
+            if "no such table" in str(e):
+                return
+            raise  # Re-raise other errors
+
+        rows = cursor.fetchall()
+        conn.commit()
+
+        if cursor.description is None:
             return
 
-    rows = cursor.fetchall()
-    conn.commit()
+        fields = [col[0] for col in cursor.description]
+        if field_types is None:
+            field_types = {}
 
-    if cursor.description is None:
-        return
+        for values in rows:
+            yield {
+                k: deserialize(v, field_types.get(k)) for k, v in zip(fields, values)
+            }
 
-    fields = [col[0] for col in cursor.description]
-    if field_types is None:
-        field_types = dict()
-    for values in rows:
-        yield {k: deserialize(v, field_types.get(k)) for k, v in zip(fields, values)}
+
+@contextmanager
+def connect(*args, **kwargs) -> Generator[sqlite3.Connection, None, None]:
+    with closing(sqlite3.connect(*args, **kwargs)) as conn:
+        yield conn
