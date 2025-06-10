@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 1.4.0
+
+Bug fixes:
+
+- Fix `Sqlite3Handler` connection cleanup.
+
+Changes:
+
+- Make `ConnectionHandler` abstract at import time instead of raising `NotImplementedError` at runtime.
+
 ## 1.3.1
 
 Bug fixes:
