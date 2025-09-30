@@ -109,9 +109,9 @@ def test_connection_handler():
     assert not connected
 
 
-def test_sqlite3_handler(tmpdir):
+def test_sqlite3_handler(tmp_path):
     logger = logging.getLogger(__name__)
-    uri = str(tmpdir / "test.db")
+    uri = str(tmp_path / "test.db")
     field_types = {"field1": 0, "field2": "", "field3": True, "field4": 0.0}
     handler = Sqlite3Handler(uri, "mytable", field_types)
     logger.addHandler(handler)

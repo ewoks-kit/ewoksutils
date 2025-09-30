@@ -3,23 +3,39 @@ import pytest
 from .. import import_utils
 
 
-def test_import_qualname(tmpdir):
-    filename = tmpdir / "mymodule.py"
+def test_import_qualname(tmp_path):
+    filename = tmp_path / "mymodule1.py"
     with open(filename, "w") as f:
         f.write("class A:\n  pass")
 
     cwd = os.getcwd()
-    os.chdir(str(tmpdir))
+    os.chdir(str(tmp_path))
     try:
-        import_utils.import_qualname("mymodule.A")
+        import_utils.import_qualname("mymodule1.A")
 
         with open(filename, "a") as f:
             f.write("\nclass B:\n  pass")
 
         with pytest.raises(ImportError):
-            import_utils.import_qualname("mymodule.B")
+            import_utils.import_qualname("mymodule1.B")
 
-        import_utils.import_qualname("mymodule.B", reload=True)
+        import_utils.import_qualname("mymodule1.B", reload=True)
 
     finally:
         os.chdir(str(cwd))
+
+
+def test_import_qualname_path(tmp_path):
+    filename = tmp_path / "mymodule2.py"
+    with open(filename, "w") as f:
+        f.write("class A:\n  pass")
+
+    import_utils.import_qualname(f"{filename}::A")
+
+    with open(filename, "a") as f:
+        f.write("\nclass B:\n  pass")
+
+    with pytest.raises(ImportError):
+        import_utils.import_qualname(f"{filename}::B")
+
+    import_utils.import_qualname(f"{filename}::B", reload=True)
