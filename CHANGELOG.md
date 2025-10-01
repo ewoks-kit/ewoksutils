@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `import_qualname`, `import_method`, `instantiate_class`, `import_module`: support importing
+  from any python file not necessarily part of an installed package.
+
 ## [1.4.0] - 2025-06-10
 
 ### Changed
