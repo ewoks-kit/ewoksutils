@@ -1,6 +1,6 @@
 from collections.abc import Mapping
-from typing import List, Optional
-
+from typing import List
+from typing import Optional
 
 __all__ = ["task_inputs"]
 

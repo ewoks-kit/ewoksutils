@@ -1,10 +1,14 @@
-import time
 import sqlite3
-from typing import Any, Dict, List, Optional, Sequence
+import time
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Sequence
 
 from ewoksutils import sqlite3_utils
-from .connection import ConnectionHandler
 
+from .connection import ConnectionHandler
 
 Sqlite3RecordType = List[Any]
 

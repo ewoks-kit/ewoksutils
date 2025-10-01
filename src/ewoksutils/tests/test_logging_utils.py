@@ -4,10 +4,10 @@ from logging.handlers import QueueHandler
 from queue import Queue
 
 from .. import sqlite3_utils
-from ..logging_utils.connection import ConnectionHandler
-from ..logging_utils.sqlite3 import Sqlite3Handler
 from ..logging_utils.asyncwrapper import AsyncHandlerWrapper
 from ..logging_utils.cleanup import cleanup_logger
+from ..logging_utils.connection import ConnectionHandler
+from ..logging_utils.sqlite3 import Sqlite3Handler
 
 
 def test_cleanup_logger():
