@@ -55,7 +55,7 @@ def import_qualname(name: str, reload: bool = False) -> Any:
 
     if "::" in name:
         # path/to/file.py::ObjectName
-        file_path, obj_name = name.split("::", 1)
+        file_path, obj_name = name.rsplit("::", 1)
         module = import_module(file_path, reload=reload)
         try:
             return getattr(module, obj_name)

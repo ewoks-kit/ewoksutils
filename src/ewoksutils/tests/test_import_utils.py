@@ -9,7 +9,7 @@ def test_import_qualname(tmp_path):
         f.write("class A:\n  pass")
 
     cwd = os.getcwd()
-    os.chdir(str(tmp_path))
+    os.chdir(tmp_path)
     try:
         import_utils.import_qualname("mymodule1.A")
 
