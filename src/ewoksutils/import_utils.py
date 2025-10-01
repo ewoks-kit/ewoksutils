@@ -30,7 +30,7 @@ def import_module(module_name: str, reload: bool = False) -> ModuleType:
         mod_name = path.stem
         already_loaded = mod_name in sys.modules
         if already_loaded and not reload:
-            mod = importlib.import_module(module_name)
+            mod = sys.modules[mod_name]
         else:
             spec = importlib.util.spec_from_file_location(mod_name, path)
             if spec is None or spec.loader is None:
