@@ -1,8 +1,8 @@
 import logging
 import logging.handlers
 import queue
-from typing import Generator
 from contextlib import contextmanager
+from typing import Generator
 
 
 @contextmanager

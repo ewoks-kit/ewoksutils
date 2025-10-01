@@ -2,6 +2,9 @@ include:
   - project: dau/ci/pyci
     file: .gitlab-ci-template.yml
 
+isort:
+  extends: .isort
+
 test-3.8:
   extends: .test-3.8
 

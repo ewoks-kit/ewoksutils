@@ -1,10 +1,16 @@
-from numbers import Integral, Real
 import json
-from datetime import datetime
-from typing import Any, Dict, Iterator, Union, Optional, Generator
 import sqlite3
 from contextlib import closing
 from contextlib import contextmanager
+from datetime import datetime
+from numbers import Integral
+from numbers import Real
+from typing import Any
+from typing import Dict
+from typing import Generator
+from typing import Iterator
+from typing import Optional
+from typing import Union
 
 from .datetime_utils import fromisoformat
 

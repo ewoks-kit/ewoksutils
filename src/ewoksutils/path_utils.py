@@ -1,7 +1,6 @@
-from typing import Union
-
 import os
 from pathlib import Path
+from typing import Union
 
 
 def makedirs_from_filename(filename: Union[str, Path]):

@@ -1,7 +1,7 @@
-import time
 import logging
-from typing import Any
+import time
 from abc import abstractmethod
+from typing import Any
 
 
 class ConnectionHandler(logging.Handler):

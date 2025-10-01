@@ -1,4 +1,5 @@
 import pytest
+
 from ..deprecation_utils import deprecated
 
 

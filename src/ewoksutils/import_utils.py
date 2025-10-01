@@ -1,9 +1,12 @@
-import sys
 import importlib
 import importlib.util
-from types import ModuleType
-from typing import Type, Callable, Any, TypeVar
+import sys
 from pathlib import Path
+from types import ModuleType
+from typing import Any
+from typing import Callable
+from typing import Type
+from typing import TypeVar
 
 T = TypeVar("T")
 

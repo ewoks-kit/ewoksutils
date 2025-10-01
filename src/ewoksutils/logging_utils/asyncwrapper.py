@@ -1,6 +1,8 @@
 import logging
-from queue import Queue, Empty
-from logging.handlers import QueueHandler, QueueListener
+from logging.handlers import QueueHandler
+from logging.handlers import QueueListener
+from queue import Empty
+from queue import Queue
 from typing import Any
 
 
