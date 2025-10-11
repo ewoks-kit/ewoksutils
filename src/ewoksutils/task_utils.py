@@ -17,7 +17,7 @@ def task_inputs(
     Provide one of ``id``, ``label`` and ``task_identifier`` to select
     the targeted tasks.
 
-    .. code:: python
+    .. code-block:: python
 
        inputs = task_inputs(task_identifier="SumTask", inputs={"a": 1, "b": 1})
 
