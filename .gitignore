@@ -5,7 +5,7 @@
 *.py[cod]
 __pycache__/
 *.so
-/doc/_generated
+/doc/reference/_generated
 
 # Distribution / packaging
 /build/

@@ -8,5 +8,4 @@ ewoksutils |version|
 .. toctree::
     :hidden:
 
-    events
-    api
+    reference/index

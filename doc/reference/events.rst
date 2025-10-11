@@ -1,5 +1,5 @@
-Workflow events
-===============
+Ewoks workflow event schema
+===========================
 
 Events are emitted when executing a workflow. They are dictionaries with the following fields:
 
