@@ -19,6 +19,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx_autodoc_typehints",
+    "sphinx_copybutton",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -36,6 +37,8 @@ autodoc_default_flags = [
     "show-inheritance",
 ]
 
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\.: | {5,8}: "
+copybutton_prompt_is_regexp = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
