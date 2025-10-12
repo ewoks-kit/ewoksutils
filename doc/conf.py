@@ -44,6 +44,8 @@ copybutton_prompt_is_regexp = True
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
+html_title = docstitle
+# html_logo = "_static/logo.png"
 html_static_path = []
 html_theme_options = {
     "icon_links": [
@@ -58,6 +60,9 @@ html_theme_options = {
             "icon": "fa-brands fa-python",
         },
     ],
+    "logo": {
+        "text": docstitle,
+    },
     "footer_start": ["copyright"],
     "footer_end": ["footer_end"],
 }
