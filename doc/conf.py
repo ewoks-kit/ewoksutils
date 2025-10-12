@@ -46,7 +46,7 @@ copybutton_prompt_is_regexp = True
 html_theme = "pydata_sphinx_theme"
 html_title = docstitle
 # html_logo = "_static/logo.png"
-html_static_path = []
+html_static_path = ["_static"]
 html_theme_options = {
     "icon_links": [
         {
