@@ -24,11 +24,15 @@ Issues = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/issues/"
 Changelog = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/-/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
+full = [
+    "click"
+]
 test = [
+    "ewoksutils[full]",
     "pytest >=7",
 ]
 dev = [
-    "pytest >=7",
+    "ewoksutils[test]",
     "black >=25",
     "flake8 >=4",
     "isort",
