@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- CLI utilities for logging and graph execution, job submission and job cancelling.
+
 ## [1.5.1] - 2025-10-01
 
 ### Fixed
