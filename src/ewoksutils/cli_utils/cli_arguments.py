@@ -8,7 +8,7 @@ def workflow_arguments(action: str) -> List[CLIArg]:
         CLIArg(
             "workflows",
             [],
-            help=f"Workflow(s) to {action} (e.g. JSON filename).",
+            help=f"Workflow(s) to {action} (e.g. JSON filename, JSON string).",
             nargs="+",
         ),
         CLIArg(
@@ -24,20 +24,17 @@ def workflow_arguments(action: str) -> List[CLIArg]:
             "Ignored when --test is provided.",
             action="store_true",
         ),
-    ]
-
-
-def subworkflow_arguments() -> List[CLIArg]:
-    return [
         CLIArg(
             "root_dir",
             ["--workflow-dir"],
-            help="Directory of sub-workflows (cwd by default)",
+            help="Directory for path-like workflow representations or "
+            "task identifiers of sub-workflows (cwd by default).",
         ),
         CLIArg(
             "root_module",
             ["--workflow-module"],
-            help="Python root module of sub-workflows (cwd by default)",
+            help="Python root module for module-like workflow representations or "
+            "task identifiers of sub-workflows (cwd by default).",
         ),
     ]
 

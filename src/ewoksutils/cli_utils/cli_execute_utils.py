@@ -19,7 +19,6 @@ def execute_arguments(
     else:
         args_list = []
     args_list += cli_arguments.workflow_arguments("execute")
-    args_list += cli_arguments.subworkflow_arguments()
     args_list += cli_arguments.ewoks_inputs_arguments()
     args_list += [
         CLIArg(
