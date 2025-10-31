@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2025-10-31
+
 ### Added
 
 - CLI utilities for logging and graph execution, job submission and job cancelling.
@@ -86,7 +88,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ewoks event definition.
 - Import utilities.
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.4.0...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.6.0...HEAD
+[1.6.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.5.1...v1.6.0
+[1.5.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.5.0...v1.5.1
+[1.5.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.4.0...v1.5.0
 [1.4.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.3.1...v1.4.0
 [1.3.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.3.0...v1.3.1
 [1.3.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.2.0...v1.3.0
