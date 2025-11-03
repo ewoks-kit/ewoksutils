@@ -23,6 +23,9 @@ test-3.12:
 test-3.13:
   extends: .test-3.13
 
+test-3.14:
+  extends: .test-3.14
+
 build_sdist:
   extends: .build_sdist
 
@@ -43,6 +46,9 @@ test_sdist-3.12:
 
 test_sdist-3.13:
   extends: .test_sdist-3.13
+
+test_sdist-3.14:
+  extends: .test_sdist-3.14
 
 build_doc:
   extends: .build_doc
