@@ -1,7 +1,6 @@
 include:
   - project: dau/ci/pyci
     file: .gitlab-ci-template.yml
-    ref: 15-what-about-producing-wheels-and-pushing-them-to-pypi
 
 isort:
   extends: .isort
