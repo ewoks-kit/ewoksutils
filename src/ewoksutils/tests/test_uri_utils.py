@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 
@@ -17,24 +16,28 @@ def test_relpath_file_uri_old():
     assert not relpath.is_absolute()
 
     uri = nonpath
-    assert uri_utils.parse_uri(uri).geturl() == "file:///file.h5"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == uri
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == dict()
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:///file.h5"
+    assert uri_utils.path_from_uri(parsed) == uri
+    assert uri_utils.parse_query(parsed) == dict()
 
     uri = relpath
-    assert uri_utils.parse_uri(uri).geturl() == "file:///relpath/file.h5"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == uri
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == dict()
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:///relpath/file.h5"
+    assert uri_utils.path_from_uri(parsed) == uri
+    assert uri_utils.parse_query(parsed) == dict()
 
     uri = f"{nonpath}::/entry"
-    assert uri_utils.parse_uri(uri).geturl() == "file:///file.h5?path=/entry"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == nonpath
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == {"path": "/entry"}
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:///file.h5?path=/entry"
+    assert uri_utils.path_from_uri(parsed) == nonpath
+    assert uri_utils.parse_query(parsed) == {"path": "/entry"}
 
     uri = f"{relpath}::/entry"
-    assert uri_utils.parse_uri(uri).geturl() == "file:///relpath/file.h5?path=/entry"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == relpath
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == {"path": "/entry"}
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:///relpath/file.h5?path=/entry"
+    assert uri_utils.path_from_uri(parsed) == relpath
+    assert uri_utils.parse_query(parsed) == {"path": "/entry"}
 
 
 @pytest.mark.skipif(
@@ -47,58 +50,65 @@ def test_relpath_file_uri():
     assert not relpath.is_absolute()
 
     uri = nonpath
-    assert uri_utils.parse_uri(uri).geturl() == "file:file.h5"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == uri
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == dict()
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:file.h5"
+    assert uri_utils.path_from_uri(parsed) == uri
+    assert uri_utils.parse_query(parsed) == dict()
 
     uri = relpath
-    assert uri_utils.parse_uri(uri).geturl() == "file:relpath/file.h5"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == uri
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == dict()
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:relpath/file.h5"
+    assert uri_utils.path_from_uri(parsed) == uri
+    assert uri_utils.parse_query(parsed) == dict()
 
     uri = f"{nonpath}::/entry"
-    assert uri_utils.parse_uri(uri).geturl() == "file:file.h5?path=/entry"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == nonpath
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == {"path": "/entry"}
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:file.h5?path=/entry"
+    assert uri_utils.path_from_uri(parsed) == nonpath
+    assert uri_utils.parse_query(parsed) == {"path": "/entry"}
 
     uri = f"{relpath}::/entry"
-    assert uri_utils.parse_uri(uri).geturl() == "file:relpath/file.h5?path=/entry"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == relpath
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == {"path": "/entry"}
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == "file:relpath/file.h5?path=/entry"
+    assert uri_utils.path_from_uri(parsed) == relpath
+    assert uri_utils.parse_query(parsed) == {"path": "/entry"}
 
 
 def test_abspath_uri():
-    abspath = Path(os.path.sep) / "abspath" / "file.h5"
+    if sys.platform == "win32":
+        abspath = Path(r"C:\abspath\file.h5")
+        expected_base_uri = "file:///C:/abspath/file.h5"
+    else:
+        abspath = Path("/abspath/file.h5")
+        expected_base_uri = "file:///abspath/file.h5"
     assert abspath.is_absolute()
 
     uri = abspath
-    assert uri_utils.parse_uri(uri).geturl() == "file:///abspath/file.h5"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == uri
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == dict()
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == expected_base_uri
+    assert uri_utils.path_from_uri(parsed) == abspath
+    assert uri_utils.parse_query(parsed) == {}
 
     uri = f"{abspath}::/entry"
-    assert uri_utils.parse_uri(uri).geturl() == "file:///abspath/file.h5?path=/entry"
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == abspath
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == {"path": "/entry"}
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == f"{expected_base_uri}?path=/entry"
+    assert uri_utils.path_from_uri(parsed) == abspath
+    assert uri_utils.parse_query(parsed) == {"path": "/entry"}
 
     uri = f"{abspath}::/entry?name=abc"
-    assert (
-        uri_utils.parse_uri(uri).geturl()
-        == "file:///abspath/file.h5?path=/entry&name=abc"
-    )
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == abspath
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == {
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == f"{expected_base_uri}?path=/entry&name=abc"
+    assert uri_utils.path_from_uri(parsed) == abspath
+    assert uri_utils.parse_query(parsed) == {
         "path": "/entry",
         "name": "abc",
     }
 
     uri = f"{abspath}::/entry?path=xyz&name=abc"
-    assert (
-        uri_utils.parse_uri(uri).geturl()
-        == "file:///abspath/file.h5?path=/entry/xyz&name=abc"
-    )
-    assert uri_utils.path_from_uri(uri_utils.parse_uri(uri)) == abspath
-    assert uri_utils.parse_query(uri_utils.parse_uri(uri)) == {
+    parsed = uri_utils.parse_uri(uri)
+    assert parsed.geturl() == f"{expected_base_uri}?path=/entry/xyz&name=abc"
+    assert uri_utils.path_from_uri(parsed) == abspath
+    assert uri_utils.parse_query(parsed) == {
         "path": "/entry/xyz",
         "name": "abc",
     }
