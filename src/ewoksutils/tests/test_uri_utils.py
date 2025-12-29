@@ -137,3 +137,33 @@ def test_join_uri():
     parsed = uri_utils.join_uri(abspath, relpath)
     assert parsed.path == joinpath
     assert uri_utils.path_from_uri(parsed) == finalpath
+
+
+@pytest.mark.parametrize(
+    "scheme, ext, is_file",
+    [
+        ("file", ".txt", False),
+        ("json", ".json", True),
+        ("yaml", ".yml", True),
+        ("nexus", ".nx", True),
+        ("hdf5", ".h5", True),
+        ("https", None, False),
+        ("redis", None, False),
+    ],
+)
+def test_round_trip(scheme, ext, is_file):
+    if ext:
+        if sys.platform == "win32":
+            uri = rf"{scheme}:///C:\path\file{ext}"
+            expected = f"{scheme}:///C:/path/file{ext}"
+        else:
+            uri = f"{scheme}:///path/file{ext}"
+            expected = uri
+    else:
+        uri = f"{scheme}://authority"
+        expected = uri
+
+    parsed = uri_utils.parse_uri(uri)
+    final = uri_utils.uri_as_string(parsed, is_file=is_file)
+
+    assert final == expected

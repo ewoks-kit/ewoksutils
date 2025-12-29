@@ -3,6 +3,7 @@ import sys
 import urllib.parse
 from pathlib import Path
 from typing import Iterable
+from typing import Optional
 from typing import Tuple
 from typing import Union
 
@@ -70,10 +71,24 @@ def join_uri(
     return urllib.parse.ParseResult(root.scheme, root.netloc, path, "", query, "")
 
 
-def uri_as_string(uri: Union[str, Path, urllib.parse.ParseResult]) -> str:
-    if isinstance(uri, urllib.parse.ParseResult):
-        return uri.geturl()
-    return str(uri)
+def uri_as_string(
+    uri: Union[str, Path, urllib.parse.ParseResult], is_file: Optional[bool] = None
+) -> str:
+    if isinstance(uri, str):
+        return uri
+    if isinstance(uri, Path):
+        uri = parse_uri(uri)
+    if not isinstance(uri, urllib.parse.ParseResult):
+        raise TypeError(type(uri))
+    if is_file and uri.scheme != "file":
+        tmp_uri = urllib.parse.ParseResult(
+            "file", uri.netloc, uri.path, uri.params, uri.query, uri.fragment
+        )
+        uri_str = (
+            tmp_uri.geturl()
+        )  # does not work with "json://" or other file scheme's
+        return uri_str.replace("file://", f"{uri.scheme}://")
+    return uri.geturl()
 
 
 def _normalize(uri: Union[str, Path]) -> Tuple[str, str]:
