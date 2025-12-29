@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2025-12-29
+
+### Added
+
+- Exposed `ewoksutils.log_utils.cleanup.cleanup_handler` to cleanup and close logging handlers.
+- Added `is_file` argument to `uri_as_string` to handle file URI's with a scheme that is not `file`.
+
+### Fixed
+
+- Fix `join_url` on Windows.
+
 ## [1.8.1] - 2025-12-29
 
 ### Fixed
@@ -107,7 +118,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ewoks event definition.
 - Import utilities.
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.1...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.9.0...HEAD
+[1.9.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.1...v1.9.0
 [1.8.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.0...v1.8.1
 [1.8.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.7.0...v1.8.0
 [1.7.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.6.0...v1.7.0
