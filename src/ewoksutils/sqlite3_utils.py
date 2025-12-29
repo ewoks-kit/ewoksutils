@@ -1,4 +1,5 @@
 import json
+import os
 import sqlite3
 from contextlib import closing
 from contextlib import contextmanager
@@ -11,6 +12,7 @@ from typing import Generator
 from typing import Iterator
 from typing import Optional
 from typing import Union
+from urllib.parse import urlparse
 
 from .datetime_utils import fromisoformat
 
@@ -141,6 +143,17 @@ def select(
 
 
 @contextmanager
-def connect(*args, **kwargs) -> Generator[sqlite3.Connection, None, None]:
-    with closing(sqlite3.connect(*args, **kwargs)) as conn:
+def connect(database: str, **kwargs) -> Generator[sqlite3.Connection, None, None]:
+    if database != ":memory:":
+        _ensure_directory_exists(database)
+    with closing(sqlite3.connect(database, **kwargs)) as conn:
         yield conn
+
+
+def _ensure_directory_exists(uri: str) -> None:
+    parsed = urlparse(uri)
+    if parsed.scheme not in ("file", ""):
+        return
+    parent_dir = os.path.dirname(parsed.path)
+    if parent_dir:
+        os.makedirs(parent_dir, exist_ok=True)

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Directory is created when connection opening an SQLite connection.
+
 ## [1.6.0] - 2025-10-31
 
 ### Added

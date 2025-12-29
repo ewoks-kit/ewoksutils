@@ -6,8 +6,7 @@ from typing import List
 from typing import Optional
 from typing import Sequence
 
-from ewoksutils import sqlite3_utils
-
+from .. import sqlite3_utils
 from .connection import ConnectionHandler
 
 Sqlite3RecordType = List[Any]
