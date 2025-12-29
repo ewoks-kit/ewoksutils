@@ -16,13 +16,16 @@ def parse_uri(
     default_port: int = None,
 ) -> urllib.parse.ParseResult:
     """The general structure of a URI is:
-    scheme://netloc/path;parameters?query#frag
+
+        scheme://netloc/path;parameters?query#fragment
+
+    For file URIs, the authority is empty for local files.
     """
     uri, query_paths = _normalize(uri)
     result = urllib.parse.urlparse(uri)
     scheme, netloc, path, params, query, fragment = result
     if _WIN32 and len(scheme) == 1:
-        result = urllib.parse.urlparse(f"file://{uri}")
+        result = urllib.parse.urlparse(f"file:///{uri}")
         scheme, netloc, path, params, query, fragment = result
     query = _merge_query(query_paths, query)
     if not scheme and default_scheme:
@@ -37,7 +40,9 @@ def path_from_uri(
 ) -> Path:
     if not isinstance(uri, urllib.parse.ParseResult):
         uri = parse_uri(uri, **parse_options)
-    return Path(uri.netloc) / uri.path
+    if _WIN32 and uri.path.startswith("/"):
+        return Path(uri.path[1:])
+    return Path(uri.path)
 
 
 def parse_query(
