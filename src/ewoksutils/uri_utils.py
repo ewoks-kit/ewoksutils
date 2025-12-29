@@ -1,4 +1,3 @@
-import os
 import re
 import sys
 import urllib.parse
@@ -62,8 +61,12 @@ def join_uri(
         relative = parse_uri(relative, **parse_options)
     if root.params or relative.params:
         raise NotImplementedError()
-    path = os.path.join(_file_path_from_parsed(root), _file_path_from_parsed(relative))
+
+    relative_path = _file_path_from_parsed(relative)
+    path = f"{root.path}/{relative_path}"
+
     query = _merge_query(root.query, relative.query)
+
     return urllib.parse.ParseResult(root.scheme, root.netloc, path, "", query, "")
 
 

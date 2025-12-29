@@ -20,6 +20,9 @@ test-3.11:
 test-3.12:
   extends: .test-3.12
 
+test-3.12-win:
+  extends: .test-3.12-win
+
 test-3.13:
   extends: .test-3.13
 

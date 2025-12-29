@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -116,13 +117,23 @@ def test_abspath_uri():
 
 def test_join_uri():
     if sys.platform == "win32":
-        abspath = Path(r"C:\abspath")
+        abspath = r"C:\abspath"
+        relpath = r"relpath\file.h5"
+        joinpath = "/C:/abspath/relpath/file.h5"
     else:
-        abspath = Path("/abspath")
-    assert abspath.is_absolute()
+        abspath = "/abspath"
+        relpath = "relpath/file.h5"
+        joinpath = "/abspath/relpath/file.h5"
 
-    relpath = Path("relpath") / "file.h5"
-    assert not relpath.is_absolute()
-
+    finalpath = os.path.join(abspath, relpath)
     parsed = uri_utils.join_uri(abspath, relpath)
-    assert uri_utils.path_from_uri(parsed) == abspath / relpath
+    assert parsed.path == joinpath
+    assert str(uri_utils.path_from_uri(parsed)) == finalpath
+
+    abspath = Path(abspath)
+    relpath = Path(relpath)
+
+    finalpath = abspath / relpath
+    parsed = uri_utils.join_uri(abspath, relpath)
+    assert parsed.path == joinpath
+    assert uri_utils.path_from_uri(parsed) == finalpath
