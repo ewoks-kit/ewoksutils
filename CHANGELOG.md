@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.1] - 2025-12-29
+
 ### Fixed
 
 - Fix `parse_uri` and `join_url` on Windows.
@@ -105,7 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ewoks event definition.
 - Import utilities.
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.0...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.1...HEAD
+[1.8.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.0...v1.8.1
 [1.8.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.7.0...v1.8.0
 [1.7.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.6.0...v1.7.0
 [1.6.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.5.1...v1.6.0
