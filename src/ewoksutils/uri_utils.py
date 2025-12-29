@@ -11,7 +11,7 @@ _WIN32 = sys.platform == "win32"
 
 
 def parse_uri(
-    uri: str,
+    uri: Union[str, Path],
     default_scheme: str = "file",
     default_port: int = None,
 ) -> urllib.parse.ParseResult:
@@ -32,26 +32,30 @@ def parse_uri(
     return type(result)(scheme, netloc, path, params, query, fragment)
 
 
-def path_from_uri(uri: Union[str, urllib.parse.ParseResult], **parse_options) -> Path:
-    if isinstance(uri, str):
+def path_from_uri(
+    uri: Union[str, Path, urllib.parse.ParseResult], **parse_options
+) -> Path:
+    if not isinstance(uri, urllib.parse.ParseResult):
         uri = parse_uri(uri, **parse_options)
     return Path(uri.netloc) / uri.path
 
 
-def parse_query(uri: Union[str, urllib.parse.ParseResult], **parse_options) -> dict:
-    if isinstance(uri, str):
+def parse_query(
+    uri: Union[str, Path, urllib.parse.ParseResult], **parse_options
+) -> dict:
+    if not isinstance(uri, urllib.parse.ParseResult):
         uri = parse_uri(uri, **parse_options)
     return _split_query(uri.query)
 
 
 def join_uri(
-    root: Union[str, urllib.parse.ParseResult],
-    relative: Union[str, urllib.parse.ParseResult],
+    root: Union[str, Path, urllib.parse.ParseResult],
+    relative: Union[str, Path, urllib.parse.ParseResult],
     **parse_options,
 ) -> urllib.parse.ParseResult:
-    if isinstance(root, str):
+    if not isinstance(root, urllib.parse.ParseResult):
         root = parse_uri(root, **parse_options)
-    if isinstance(relative, str):
+    if not isinstance(relative, urllib.parse.ParseResult):
         relative = parse_uri(relative, **parse_options)
     if root.params or relative.params:
         raise NotImplementedError()
@@ -60,14 +64,14 @@ def join_uri(
     return urllib.parse.ParseResult(root.scheme, root.netloc, path, "", query, "")
 
 
-def uri_as_string(uri: Union[str, urllib.parse.ParseResult]) -> str:
+def uri_as_string(uri: Union[str, Path, urllib.parse.ParseResult]) -> str:
     if isinstance(uri, urllib.parse.ParseResult):
         return uri.geturl()
-    return uri
+    return str(uri)
 
 
-def _normalize(uri: str) -> Tuple[str, str]:
-    uri = uri.replace("\\", "/")
+def _normalize(uri: Union[str, Path]) -> Tuple[str, str]:
+    uri = str(uri).replace("\\", "/")
     # Non-standard notation:
     #   "/some/path::/another/path"
     # means
