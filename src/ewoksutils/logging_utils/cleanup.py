@@ -15,17 +15,20 @@ def protect_logging_state() -> Generator[None, None, None]:
 
 
 def cleanup_logger(name: str):
-    """Cleanup and delete a global python logger"""
+    """Cleanup and delete a global python logger."""
     with protect_logging_state():
         # Remove reference from root
         logger = logging.root.manager.loggerDict.pop(name, None)
         if not isinstance(logger, logging.Logger):
             return
+
         # Remove references from place holders
-        _cleanup_logger_instance(logger)
+        for handler in logger.handlers:
+            cleanup_handler(handler)
         for placeholder in list(logging.root.manager.loggerDict.values()):
             if isinstance(placeholder, logging.PlaceHolder):
                 placeholder.loggerMap.pop(logger, None)
+
         # Remove references from children
         children = [
             name
@@ -34,20 +37,20 @@ def cleanup_logger(name: str):
         ]
         for child in children:
             cleanup_logger(child)
+
         # Remove local reference
         del logger
 
 
-def _cleanup_logger_instance(logger: logging.Logger):
-    """Cleanup a python logger"""
-    for handler in logger.handlers:
-        if isinstance(handler, logging.handlers.QueueHandler):
-            handler.acquire()
-            try:
-                q = handler.queue
-                if isinstance(q, queue.Queue):
-                    with q.mutex:
-                        q.queue.clear()
-            finally:
-                handler.release()
-        handler.close()
+def cleanup_handler(handler: logging.Handler) -> None:
+    """Cleanup and close a python log handler."""
+    if isinstance(handler, logging.handlers.QueueHandler):
+        handler.acquire()
+        try:
+            q = handler.queue
+            if isinstance(q, queue.Queue):
+                with q.mutex:
+                    q.queue.clear()
+        finally:
+            handler.release()
+    handler.close()

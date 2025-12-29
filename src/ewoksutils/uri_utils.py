@@ -19,7 +19,7 @@ def parse_uri(
 
         <scheme>://<netloc><path>;<parameters>?<query>#<fragment>
 
-    For file URIs, the authority is empty for local files.
+    For file URIs, the netloc is empty for local files.
     """
     uri, query_paths = _normalize(uri)
     result = urllib.parse.urlparse(uri)
