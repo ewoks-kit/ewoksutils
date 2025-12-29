@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `ewoksutils.log_utils.cleanup.cleanup_handler` to cleanup and close logging handlers.
+- Exposed `ewoksutils.log_utils.cleanup.cleanup_handler` to cleanup and close logging handlers.
+- Added `is_file` argument to `uri_as_string` to handle file URI's with a scheme that is not `file`.
+
+### Fixed
+
+- Fix `join_url` on Windows.
 
 ## [1.8.1] - 2025-12-29
 
