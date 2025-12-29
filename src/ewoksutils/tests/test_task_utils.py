@@ -1,6 +1,6 @@
 import pytest
 
-from ewoksutils.task_utils import task_inputs
+from ..task_utils import task_inputs
 
 
 @pytest.mark.parametrize("selector", ["id", "label", "task_identifier"])
