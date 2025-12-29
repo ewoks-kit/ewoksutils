@@ -17,14 +17,14 @@ def parse_uri(
 ) -> urllib.parse.ParseResult:
     """The general structure of a URI is:
 
-        scheme://netloc/path;parameters?query#fragment
+        <scheme>://<netloc><path>;<parameters>?<query>#<fragment>
 
     For file URIs, the authority is empty for local files.
     """
     uri, query_paths = _normalize(uri)
     result = urllib.parse.urlparse(uri)
     scheme, netloc, path, params, query, fragment = result
-    if _WIN32 and len(scheme) == 1:
+    if _WIN32 and len(scheme) == 1 and default_scheme == "file":
         result = urllib.parse.urlparse(f"file:///{uri}")
         scheme, netloc, path, params, query, fragment = result
     query = _merge_query(query_paths, query)
@@ -40,9 +40,7 @@ def path_from_uri(
 ) -> Path:
     if not isinstance(uri, urllib.parse.ParseResult):
         uri = parse_uri(uri, **parse_options)
-    if _WIN32 and uri.path.startswith("/"):
-        return Path(uri.path[1:])
-    return Path(uri.path)
+    return Path(_file_path_from_parsed(uri))
 
 
 def parse_query(
@@ -64,7 +62,7 @@ def join_uri(
         relative = parse_uri(relative, **parse_options)
     if root.params or relative.params:
         raise NotImplementedError()
-    path = os.path.join(root.path, relative.path)
+    path = os.path.join(_file_path_from_parsed(root), _file_path_from_parsed(relative))
     query = _merge_query(root.query, relative.query)
     return urllib.parse.ParseResult(root.scheme, root.netloc, path, "", query, "")
 
@@ -133,3 +131,9 @@ def _merge_query(query1: str, query2: str) -> str:
         elif value2:
             merged.append((name, value2))
     return _join_query(merged)
+
+
+def _file_path_from_parsed(uri: urllib.parse.ParseResult) -> str:
+    if _WIN32 and uri.path.startswith("/"):
+        return uri.path[1:]
+    return uri.path

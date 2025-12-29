@@ -112,3 +112,17 @@ def test_abspath_uri():
         "path": "/entry/xyz",
         "name": "abc",
     }
+
+
+def test_join_uri():
+    if sys.platform == "win32":
+        abspath = Path(r"C:\abspath")
+    else:
+        abspath = Path("/abspath")
+    assert abspath.is_absolute()
+
+    relpath = Path("relpath") / "file.h5"
+    assert not relpath.is_absolute()
+
+    parsed = uri_utils.join_uri(abspath, relpath)
+    assert uri_utils.path_from_uri(parsed) == abspath / relpath
