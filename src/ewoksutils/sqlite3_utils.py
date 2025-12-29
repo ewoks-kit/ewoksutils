@@ -1,5 +1,4 @@
 import json
-import os
 import sqlite3
 from contextlib import closing
 from contextlib import contextmanager
@@ -12,8 +11,8 @@ from typing import Generator
 from typing import Iterator
 from typing import Optional
 from typing import Union
-from urllib.parse import urlparse
 
+from . import uri_utils
 from .datetime_utils import fromisoformat
 
 
@@ -151,9 +150,7 @@ def connect(database: str, **kwargs) -> Generator[sqlite3.Connection, None, None
 
 
 def _ensure_directory_exists(uri: str) -> None:
-    parsed = urlparse(uri)
-    if parsed.scheme not in ("file", ""):
-        return
-    parent_dir = os.path.dirname(parsed.path)
-    if parent_dir:
-        os.makedirs(parent_dir, exist_ok=True)
+    parsed = uri_utils.parse_uri(uri)
+    if parsed.scheme == "file":
+        path = uri_utils.path_from_uri(uri)
+        path.parent.mkdir(parents=True, exist_ok=True)
