@@ -6,6 +6,8 @@ import pytest
 
 from .. import uri_utils
 
+_WIN32 = sys.platform == "win32"
+
 
 @pytest.mark.skipif(
     sys.version_info >= (3, 12, 5), reason="Behaviour changes in python3.12.5"
@@ -140,30 +142,124 @@ def test_join_uri():
 
 
 @pytest.mark.parametrize(
-    "scheme, ext, is_file",
+    "scheme,value",
     [
-        ("file", ".txt", False),
-        ("json", ".json", True),
-        ("yaml", ".yml", True),
-        ("nexus", ".nx", True),
-        ("hdf5", ".h5", True),
-        ("https", None, False),
-        ("redis", None, False),
+        ("https", "www.myhost.fr"),
+        ("redis", "localhost"),
+        ("custom", "localhost"),
+        ("https", ""),
+        ("redis", ""),
+        ("custom", ""),
     ],
 )
-def test_round_trip(scheme, ext, is_file):
-    if ext:
-        if sys.platform == "win32":
-            uri = rf"{scheme}:///C:\path\file{ext}"
-            expected = f"{scheme}:///C:/path/file{ext}"
-        else:
-            uri = f"{scheme}:///path/file{ext}"
-            expected = uri
-    else:
-        uri = f"{scheme}://authority"
-        expected = uri
+def test_round_trip_netloc(scheme, value):
+    uri = f"{scheme}://{value}"
+
+    exp_parsed = scheme, value, "", "", "", ""
+    exp_final = uri
 
     parsed = uri_utils.parse_uri(uri)
-    final = uri_utils.uri_as_string(parsed, is_file=is_file)
+    final = uri_utils.uri_as_string(parsed)
 
-    assert final == expected
+    assert tuple(parsed) == exp_parsed
+    assert final == exp_final
+
+
+@pytest.mark.skipif(_WIN32, reason="Non-Windows path semantics")
+@pytest.mark.parametrize(
+    "scheme,ext",
+    [
+        ("file", ".txt"),
+        ("json", ".json"),
+        ("yaml", ".yml"),
+        ("nexus", ".nx"),
+        ("hdf5", ".h5"),
+    ],
+)
+def test_round_trip_path_double_slash_posix(scheme, ext):
+    path = f"/path/file{ext}"
+    uri = f"{scheme}://{path}"
+
+    exp_parsed = scheme, "", path, "", "", ""
+    exp_final = f"{scheme}://{path}"
+
+    parsed = uri_utils.parse_uri(uri)
+    final = uri_utils.uri_as_string(parsed)
+
+    assert tuple(parsed) == exp_parsed
+    assert final == exp_final
+
+
+@pytest.mark.skipif(_WIN32, reason="Non-Windows path semantics")
+@pytest.mark.parametrize(
+    "scheme,ext",
+    [
+        ("file", ".txt"),
+        ("json", ".json"),
+        ("yaml", ".yml"),
+        ("nexus", ".nx"),
+        ("hdf5", ".h5"),
+    ],
+)
+def test_round_trip_path_single_slash_posix(scheme, ext):
+    path = f"/path/file{ext}"
+    uri = f"{scheme}:{path}"
+
+    exp_parsed = scheme, "", path, "", "", ""
+    exp_final = f"{scheme}://{path}"
+
+    parsed = uri_utils.parse_uri(uri)
+    final = uri_utils.uri_as_string(parsed)
+
+    assert tuple(parsed) == exp_parsed
+    assert final == exp_final
+
+
+@pytest.mark.skipif(not _WIN32, reason="Windows path semantics")
+@pytest.mark.parametrize(
+    "scheme,ext",
+    [
+        ("file", ".txt"),
+        ("json", ".json"),
+        ("yaml", ".yml"),
+        ("nexus", ".nx"),
+        ("hdf5", ".h5"),
+    ],
+)
+def test_round_trip_path_double_slash_windows(scheme, ext):
+    path = rf"C:\path\file{ext}"
+    uri = f"{scheme}:///{path}"
+
+    exp_parsed = scheme, "", f"/C:/path/file{ext}", "", "", ""
+    exp_final = f"{scheme}:///C:/path/file{ext}"
+
+    parsed = uri_utils.parse_uri(uri)
+    final = uri_utils.uri_as_string(parsed)
+
+    assert tuple(parsed) == exp_parsed
+    assert final == exp_final
+
+
+@pytest.mark.skipif(not _WIN32, reason="Windows path semantics")
+@pytest.mark.parametrize(
+    "scheme,ext",
+    [
+        ("file", ".txt"),
+        ("json", ".json"),
+        ("yaml", ".yml"),
+        ("nexus", ".nx"),
+        ("hdf5", ".h5"),
+    ],
+)
+def test_round_trip_path_single_slash_windows(scheme, ext):
+    path = rf"C:\path\file{ext}"
+    uri = f"{scheme}:/{path}"
+
+    exp_parsed = scheme, "", f"/C:/path/file{ext}", "", "", ""
+    exp_final = f"{scheme}:///C:/path/file{ext}"
+
+    parsed = uri_utils.parse_uri(uri)
+    final = uri_utils.uri_as_string(parsed)
+
+    assert tuple(parsed) == exp_parsed
+    assert final == exp_final

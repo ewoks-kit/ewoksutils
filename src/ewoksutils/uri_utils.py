@@ -13,26 +13,28 @@ _WIN32 = sys.platform == "win32"
 def parse_uri(
     uri: Union[str, Path],
     default_scheme: str = "file",
-    default_port: int = None,
+    default_port: Optional[int] = None,
 ) -> urllib.parse.ParseResult:
-    """The general structure of a URI is:
+    """
+    Parse a URI following RFC 3986 rules.
 
-        <scheme>://<netloc><path>;<parameters>?<query>#<fragment>
-
-    For file URIs, the netloc is empty for local files.
+    The scheme and path components are required, though the path may be empty.
+    When authority is present, the path must either be empty or begin with "/".
+    When authority is not present, the path cannot begin with "//".
     """
     uri, query_paths = _normalize(uri)
-    result = urllib.parse.urlparse(uri)
-    scheme, netloc, path, params, query, fragment = result
-    if _WIN32 and len(scheme) == 1 and default_scheme == "file":
-        result = urllib.parse.urlparse(f"file:///{uri}")
-        scheme, netloc, path, params, query, fragment = result
+
+    parsed = urllib.parse.urlparse(uri)
+    scheme, netloc, path, params, query, fragment = parsed
+
     query = _merge_query(query_paths, query)
+
     if not scheme and default_scheme:
         scheme = default_scheme
-    if default_port and not result.port:
-        netloc = f"{result.hostname}:{default_port}"
-    return type(result)(scheme, netloc, path, params, query, fragment)
+    if default_port and not parsed.port:
+        netloc = f"{parsed.hostname}:{default_port}"
+
+    return urllib.parse.ParseResult(scheme, netloc, path, params, query, fragment)
 
 
 def path_from_uri(
@@ -60,8 +62,9 @@ def join_uri(
         root = parse_uri(root, **parse_options)
     if not isinstance(relative, urllib.parse.ParseResult):
         relative = parse_uri(relative, **parse_options)
+
     if root.params or relative.params:
-        raise NotImplementedError()
+        raise NotImplementedError("URI params are not supported")
 
     relative_path = _file_path_from_parsed(relative)
     path = f"{root.path}/{relative_path}"
@@ -71,38 +74,44 @@ def join_uri(
     return urllib.parse.ParseResult(root.scheme, root.netloc, path, "", query, "")
 
 
-def uri_as_string(
-    uri: Union[str, Path, urllib.parse.ParseResult], is_file: Optional[bool] = None
-) -> str:
+def uri_as_string(uri: Union[str, Path, urllib.parse.ParseResult]) -> str:
     if isinstance(uri, str):
         return uri
     if isinstance(uri, Path):
         uri = parse_uri(uri)
     if not isinstance(uri, urllib.parse.ParseResult):
         raise TypeError(type(uri))
-    if is_file and uri.scheme != "file":
+
+    if not uri.netloc:
         tmp_uri = urllib.parse.ParseResult(
             "file", uri.netloc, uri.path, uri.params, uri.query, uri.fragment
         )
-        uri_str = (
-            tmp_uri.geturl()
-        )  # does not work with "json://" or other file scheme's
-        return uri_str.replace("file://", f"{uri.scheme}://")
+        uri_str = tmp_uri.geturl()
+        return uri_str.replace("file://", f"{uri.scheme}://", 1)
+
     return uri.geturl()
 
 
 def _normalize(uri: Union[str, Path]) -> Tuple[str, str]:
-    uri = str(uri).replace("\\", "/")
+    """Handle URI's that do not follow the RFC 3986 rules."""
+
+    uri = str(uri).replace("\\", "/")  # Handle Windows paths
+
+    # Windows drive-letter path handling (C:/..., D:/...)
+    if _WIN32 and re.match(r"^[A-Za-z]:/", uri):
+        uri = f"file:///{uri}"
+
     # Non-standard notation:
     #   "/some/path::/another/path"
-    # means
+    # becomes:
     #   "/some/path?path=/another/path"
     query = ""
-    query_paths = re.findall("::([^;?#]*)", uri)
+    query_paths = re.findall(r"::([^;?#]*)", uri)
     if query_paths:
         for path in query_paths:
             uri = uri.replace("::" + path, "")
         query = _join_query(("path", path) for path in query_paths)
+
     return uri, query
 
 
@@ -123,23 +132,22 @@ def _join_query(query_items: Iterable[Tuple[str, str]]) -> str:
     return "&".join(f"{k}={v}" for k, v in query_items)
 
 
-def _join_string(a: str, b: str, sep: str):
+def _join_string(a: str, b: str, sep: str) -> str:
     aslash = a.endswith(sep)
     bslash = b.startswith(sep)
     if aslash and bslash:
         return a[:-1] + b
-    elif aslash or bslash:
+    if aslash or bslash:
         return a + b
-    else:
-        return a + sep + b
+    return a + sep + b
 
 
 def _merge_query(query1: str, query2: str) -> str:
     query1 = _split_query(query1)
     query2 = _split_query(query2)
-    merged = list()
-    names = list(query1) + list(query2)
-    for name in names:
+    merged = []
+
+    for name in list(query1) + list(query2):
         value1 = query1.pop(name, None)
         value2 = query2.pop(name, None)
         if value1 and value2:
@@ -148,6 +156,7 @@ def _merge_query(query1: str, query2: str) -> str:
             merged.append((name, value1))
         elif value2:
             merged.append((name, value2))
+
     return _join_query(merged)
 
 
