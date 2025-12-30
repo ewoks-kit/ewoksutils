@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.1] - 2025-12-29
+
 ### Removed
 
 - Removed `is_file` argument from `uri_as_string` and handle empty authority for all scheme's.
 
-## [1.9.0] - 2025-12-29
+## [1.9.0] - 2025-12-29  [YANKED]
 
 ### Added
 
@@ -122,7 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ewoks event definition.
 - Import utilities.
 
-[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.9.0...HEAD
+[unreleased]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.9.1...HEAD
+[1.9.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.9.0...v1.9.1
 [1.9.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.1...v1.9.0
 [1.8.1]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.8.0...v1.8.1
 [1.8.0]: https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/compare/v1.7.0...v1.8.0

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ewoksutils"
-version = "1.9.0"
+version = "1.9.1"
 authors = [{name = "ESRF", email = "dau-pydev@esrf.fr"}]
 description = "Utilities for ewoks developers"
 readme = {file = "README.md", content-type = "text/markdown"}
