@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Removed `is_file` argument from `uri_as_string` and handle empty authority for all scheme's.
+
 ## [1.9.0] - 2025-12-29
 
 ### Added
