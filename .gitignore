@@ -1,5 +1,8 @@
 # Hidden files
 .*
+!.gitignore
+!.readthedocs.yaml
+!.flake8
 
 # Byte / compiled / optimized
 *.py[cod]

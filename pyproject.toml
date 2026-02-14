@@ -17,11 +17,11 @@ classifiers = [
 requires-python = ">=3.8"
 
 [project.urls]
-Homepage = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/"
+Homepage = "https://github.com/ewoks-kit/ewoksutils/"
 Documentation = "https://ewoksutils.readthedocs.io/"
-Repository = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/"
-Issues = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/issues/"
-Changelog = "https://gitlab.esrf.fr/workflow/ewoks/ewoksutils/-/blob/main/CHANGELOG.md"
+Repository = "https://github.com/ewoks-kit/ewoksutils/"
+Issues = "https://github.com/ewoks-kit/ewoksutils/issues/"
+Changelog = "https://github.com/ewoks-kit/ewoksutils/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 full = [
