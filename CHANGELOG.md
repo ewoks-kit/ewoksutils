@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.2] - 2025-12-29
+
+### Changed
+
+Project migrated to https://github.com/ewoks-kit/ewoksutils.
+
 ## [1.9.1] - 2025-12-29
 
 ### Removed
@@ -124,7 +130,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ewoks event definition.
 - Import utilities.
 
-[unreleased]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.1...HEAD
+[unreleased]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.2...HEAD
+[1.9.2]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/ewoks-kit/ewoksutils/compare/v1.8.1...v1.9.0
 [1.8.1]: https://github.com/ewoks-kit/ewoksutils/compare/v1.8.0...v1.8.1
