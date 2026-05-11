@@ -7,6 +7,7 @@ from glob import glob
 from json.decoder import JSONDecodeError
 from typing import Any
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 logger = logging.getLogger(__name__)
@@ -93,7 +94,7 @@ _NODE_ATTR_MAP = {"id": "id", "label": "label", "taskid": "task_identifier"}
 
 
 def parse_parameter(
-    input_item: str, node_attr: str = None, all_nodes: bool = False
+    input_item: str, node_attr: Optional[str] = None, all_nodes: Optional[bool] = None
 ) -> dict:
     """The format of `input_item` is `"[NODE:]NAME=VALUE"`."""
 
@@ -110,13 +111,12 @@ def parse_parameter(
     var_value = parse_value(value)
 
     if node is None:
+        if all_nodes is None:
+            raise ValueError(f"{input_item} needs a target NODE:{input_item}")
         return {"all": all_nodes, "name": var_name, "value": var_value}
 
-    if node_attr is None:
-        raise ValueError(
-            f"Node specified in parameter '{input_item}' "
-            "but no node attribute type was provided."
-        )
+    if node_attr is None and node is not None:
+        raise ValueError(f"{input_item} does not need the target '{node}'")
 
     return {_NODE_ATTR_MAP[node_attr]: node, "name": var_name, "value": var_value}
 

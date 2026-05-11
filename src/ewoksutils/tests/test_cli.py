@@ -74,6 +74,35 @@ def test_cli_execute_parameters(cli_interface):
     assert cli_args.execute_options == execute_options
 
 
+@pytest.mark.parametrize("argument", ["pn", "pt", "pl"])
+def test_cli_execute_missing_parameter_target(cli_interface, argument):
+    argv = ["acyclic1", "--test", f"-{argument}", "a=1"]  # This is missing a target
+
+    with pytest.raises(ValueError, match="a=1 needs a target NODE:a=1"):
+        _ = cli_interface(
+            argv,
+            cli_execute_utils.execute_arguments,
+            cli_execute_utils.parse_execute_argument,
+        )
+
+
+@pytest.mark.parametrize("argument", ["ps", "pa"])
+def test_cli_execute_unexpected_parameter_target(cli_interface, argument):
+    argv = [
+        "acyclic1",
+        "--test",
+        f"-{argument}",
+        "node1:a=1",  # This has un unexpected target
+    ]
+
+    with pytest.raises(ValueError, match="node1:a=1 does not need the target 'node1'"):
+        _ = cli_interface(
+            argv,
+            cli_execute_utils.execute_arguments,
+            cli_execute_utils.parse_execute_argument,
+        )
+
+
 def test_cli_execute_deprecated_parameters(cli_interface):
     argv = ["acyclic1", "--test", "-p", "a=1", "-p", "task1:b=test"]
 
@@ -177,7 +206,7 @@ def test_cli_submit(cli_interface):
         "acyclic1",
         "acyclic2",
         "--test",
-        "-pn",
+        "-ps",
         "a=1",
         "-pn",
         "node1:b=test",
@@ -195,8 +224,8 @@ def test_cli_submit(cli_interface):
 
     execute_options = {
         "inputs": [
-            {"all": False, "name": "a", "value": 1},
             {"id": "node1", "name": "b", "value": "test"},
+            {"all": False, "name": "a", "value": 1},
         ],
         "merge_outputs": False,
         "outputs": [],
