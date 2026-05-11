@@ -42,24 +42,69 @@ def workflow_arguments(action: str) -> List[CLIArg]:
 def ewoks_inputs_arguments() -> List[CLIArg]:
     return [
         CLIArg(
+            "parameters_nodeid",
+            ["-pn", "--parameter-nodeid"],
+            help="Input variable for a node addressed by node id.",
+            action="append",
+            metavar="[NODE_ID:]NAME=VALUE",
+        ),
+        CLIArg(
+            "parameters_taskid",
+            ["-pt", "--parameter-taskid"],
+            help="Input variable for a node addressed by task identifier.",
+            action="append",
+            metavar="[TASK_ID:]NAME=VALUE",
+        ),
+        CLIArg(
+            "parameters_label",
+            ["-pl", "--parameter-label"],
+            help="Input variable for a node addressed by node label.",
+            action="append",
+            metavar="[LABEL:]NAME=VALUE",
+        ),
+        CLIArg(
+            "parameters_start",
+            ["-ps", "--parameter-start"],
+            help="Input variable for all start nodes.",
+            action="append",
+            metavar="NAME=VALUE",
+        ),
+        CLIArg(
+            "parameters_all",
+            ["-pa", "--parameter-all"],
+            help="Input variable for all nodes.",
+            action="append",
+            metavar="NAME=VALUE",
+        ),
+        # Deprecated legacy option
+        CLIArg(
             "parameters",
             ["-p", "--parameter"],
-            help="Input variable for a particular node"
-            " (or all start nodes when missing)",
+            help=(
+                "DEPRECATED: use -pn/-pt/-pl/-ps/-pa instead. "
+                "Input variable for a particular node "
+                "(or start/all nodes when missing depending on --inputs)."
+            ),
             action="append",
             metavar="[NODE:]NAME=VALUE",
         ),
         CLIArg(
             "node_attr",
             ["--input-node-id"],
-            help="The NODE attribute used when specifying an input parameter",
+            help=(
+                "DEPRECATED: use -pn/-pt/-pl instead. "
+                "The NODE attribute used when specifying an input parameter."
+            ),
             choices=["id", "label", "taskid"],
             default="id",
         ),
         CLIArg(
             "inputs",
             ["--inputs"],
-            help="Inputs without a specific node go to start/all nodes",
+            help=(
+                "DEPRECATED: use -ps/-pa instead. "
+                "Inputs without a specific node go to start/all nodes."
+            ),
             choices=["start", "all"],
             default="start",
         ),

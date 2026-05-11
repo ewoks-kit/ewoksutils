@@ -1,17 +1,15 @@
+import pytest
+
 from ..cli_utils import cli_cancel_utils
 from ..cli_utils import cli_execute_utils
 from ..cli_utils import cli_submit_utils
 
 
-def test_cli_execute(cli_interface):
+def test_cli_execute_no_parameters(cli_interface):
     argv = [
         "acyclic1",
         "acyclic2",
         "--test",
-        "-p",
-        "a=1",
-        "-p",
-        "task1:b=test",
         "--workflow-dir",
         "/tmp",
     ]
@@ -24,10 +22,7 @@ def test_cli_execute(cli_interface):
     assert list(cli_args.graphs) == ["acyclic1", "acyclic2"]
 
     execute_options = {
-        "inputs": [
-            {"all": False, "name": "a", "value": 1},
-            {"id": "task1", "name": "b", "value": "test"},
-        ],
+        "inputs": [],
         "merge_outputs": False,
         "outputs": [],
         "task_options": {},
@@ -38,15 +33,154 @@ def test_cli_execute(cli_interface):
     assert cli_args.execute_options == execute_options
 
 
+def test_cli_execute_parameters(cli_interface):
+    argv = [
+        "acyclic1",
+        "--test",
+        "-ps",
+        "a=1",
+        "-pa",
+        "b=2",
+        "-pn",
+        "node1:c=3",
+        "-pt",
+        "task1:d=4",
+        "-pl",
+        "label1:e=5",
+    ]
+
+    cli_args = cli_interface(
+        argv,
+        cli_execute_utils.execute_arguments,
+        cli_execute_utils.parse_execute_argument,
+    )
+
+    execute_options = {
+        "inputs": [
+            {"id": "node1", "name": "c", "value": 3},
+            {"task_identifier": "task1", "name": "d", "value": 4},
+            {"label": "label1", "name": "e", "value": 5},
+            {"all": False, "name": "a", "value": 1},
+            {"all": True, "name": "b", "value": 2},
+        ],
+        "merge_outputs": False,
+        "outputs": [],
+        "task_options": {},
+        "varinfo": {"root_uri": "", "scheme": "nexus"},
+        "load_options": {"representation": "test_core"},
+        "execinfo": {},
+    }
+
+    assert cli_args.execute_options == execute_options
+
+
+def test_cli_execute_deprecated_parameters(cli_interface):
+    argv = ["acyclic1", "--test", "-p", "a=1", "-p", "task1:b=test"]
+
+    with pytest.deprecated_call(match="-p/--parameter is deprecated"):
+        cli_args = cli_interface(
+            argv,
+            cli_execute_utils.execute_arguments,
+            cli_execute_utils.parse_execute_argument,
+        )
+
+    assert list(cli_args.graphs) == ["acyclic1"]
+
+    execute_options = {
+        "inputs": [
+            {"all": False, "name": "a", "value": 1},
+            {"id": "task1", "name": "b", "value": "test"},
+        ],
+        "merge_outputs": False,
+        "outputs": [],
+        "task_options": {},
+        "varinfo": {"root_uri": "", "scheme": "nexus"},
+        "load_options": {"representation": "test_core"},
+        "execinfo": {},
+    }
+
+    assert cli_args.execute_options == execute_options
+
+
+def test_cli_execute_deprecated_input_node_id(cli_interface):
+    argv = [
+        "acyclic1",
+        "--test",
+        "--input-node-id",
+        "taskid",
+        "-p",
+        "task1:b=test",
+    ]
+
+    with pytest.deprecated_call(match="-p/--parameter is deprecated"):
+        with pytest.deprecated_call(match="--input-node-id=taskid is deprecated"):
+            cli_args = cli_interface(
+                argv,
+                cli_execute_utils.execute_arguments,
+                cli_execute_utils.parse_execute_argument,
+            )
+
+    execute_options = {
+        "inputs": [
+            {
+                "task_identifier": "task1",
+                "name": "b",
+                "value": "test",
+            }
+        ],
+        "merge_outputs": False,
+        "outputs": [],
+        "task_options": {},
+        "varinfo": {"root_uri": "", "scheme": "nexus"},
+        "load_options": {"representation": "test_core"},
+        "execinfo": {},
+    }
+
+    assert cli_args.execute_options == execute_options
+
+
+def test_cli_execute_deprecated_inputs_all(cli_interface):
+    argv = [
+        "acyclic1",
+        "--test",
+        "--inputs",
+        "all",
+        "-p",
+        "a=1",
+    ]
+
+    with pytest.deprecated_call(match="-p/--parameter is deprecated"):
+        with pytest.deprecated_call(match="--inputs=all is deprecated"):
+            cli_args = cli_interface(
+                argv,
+                cli_execute_utils.execute_arguments,
+                cli_execute_utils.parse_execute_argument,
+            )
+
+    execute_options = {
+        "inputs": [
+            {"all": True, "name": "a", "value": 1},
+        ],
+        "merge_outputs": False,
+        "outputs": [],
+        "task_options": {},
+        "varinfo": {"root_uri": "", "scheme": "nexus"},
+        "load_options": {"representation": "test_core"},
+        "execinfo": {},
+    }
+
+    assert cli_args.execute_options == execute_options
+
+
 def test_cli_submit(cli_interface):
     argv = [
         "acyclic1",
         "acyclic2",
         "--test",
-        "-p",
+        "-pn",
         "a=1",
-        "-p",
-        "task1:b=test",
+        "-pn",
+        "node1:b=test",
         "--workflow-dir",
         "/tmp",
         "--wait=inf",
@@ -62,7 +196,7 @@ def test_cli_submit(cli_interface):
     execute_options = {
         "inputs": [
             {"all": False, "name": "a", "value": 1},
-            {"id": "task1", "name": "b", "value": "test"},
+            {"id": "node1", "name": "b", "value": "test"},
         ],
         "merge_outputs": False,
         "outputs": [],
