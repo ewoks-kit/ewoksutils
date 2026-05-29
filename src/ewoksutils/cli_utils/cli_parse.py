@@ -19,7 +19,13 @@ def parse_ewoks_inputs_parameters(cli_args: Namespace) -> List[dict]:
     # Deprecated options
 
     if cli_args.parameters:
-        replacement = {"id": "-pn", "label": "-pl", "taskid": "-pt"}[cli_args.node_attr]
+        node_attr_replacement = {"id": "-pn", "label": "-pl", "taskid": "-pt"}
+        node_attr_default_value = "id"
+        inputs_replacement = {"start": "-ps", "all": "-pa"}
+        inputs_default_value = "start"
+
+        # Deprecate -p
+        replacement = node_attr_replacement[cli_args.node_attr]
 
         if cli_args.inputs == "all":
             default_target = "-pa"
@@ -32,16 +38,18 @@ def parse_ewoks_inputs_parameters(cli_args: Namespace) -> List[dict]:
             f"and {default_target} for parameters without a node selector."
         )
 
-        if cli_args.node_attr != "id":
-            replacement = {"label": "-pl", "taskid": "-pt"}[cli_args.node_attr]
+        # Deprecate --input-node-id when used
+        if cli_args.node_attr != node_attr_default_value:
+            replacement = node_attr_replacement[cli_args.node_attr]
 
             _deprecated(
                 f"--input-node-id={cli_args.node_attr} is deprecated; "
                 f"use {replacement} instead."
             )
 
-        if cli_args.inputs != "start":
-            replacement = {"start": "-ps", "all": "-pa"}[cli_args.inputs]
+        # Deprecate --inputs when used
+        if cli_args.inputs != inputs_default_value:
+            replacement = inputs_replacement[cli_args.inputs]
 
             _deprecated(
                 f"--inputs={cli_args.inputs} is deprecated; "
