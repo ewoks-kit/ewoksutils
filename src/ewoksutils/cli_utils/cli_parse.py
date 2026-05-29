@@ -7,7 +7,6 @@ from glob import glob
 from json.decoder import JSONDecodeError
 from typing import Any
 from typing import List
-from typing import Optional
 from typing import Tuple
 
 logger = logging.getLogger(__name__)
@@ -56,37 +55,36 @@ def parse_ewoks_inputs_parameters(cli_args: Namespace) -> List[dict]:
                 f"use {replacement} instead."
             )
 
-        parameters.extend(
-            parse_parameter(
-                input_item,
-                node_attr=cli_args.node_attr,
-                all_nodes=(cli_args.inputs == "all"),
-            )
-            for input_item in cli_args.parameters
-        )
+        all_nodes = cli_args.inputs == "all"
+        for input_item in cli_args.parameters:
+            if parameter_has_target(input_item):
+                param = parse_targeted_parameter(input_item, cli_args.node_attr)
+            else:
+                param = parse_untargeted_parameter(input_item, all_nodes=all_nodes)
+            parameters.append(param)
 
     parameters.extend(
-        parse_parameter(input_item, node_attr="id")
+        parse_targeted_parameter(input_item, "id")
         for input_item in cli_args.parameters_nodeid
     )
 
     parameters.extend(
-        parse_parameter(input_item, node_attr="taskid")
+        parse_targeted_parameter(input_item, "taskid")
         for input_item in cli_args.parameters_taskid
     )
 
     parameters.extend(
-        parse_parameter(input_item, node_attr="label")
+        parse_targeted_parameter(input_item, "label")
         for input_item in cli_args.parameters_label
     )
 
     parameters.extend(
-        parse_parameter(input_item, all_nodes=False)
+        parse_untargeted_parameter(input_item, all_nodes=False)
         for input_item in cli_args.parameters_start
     )
 
     parameters.extend(
-        parse_parameter(input_item, all_nodes=True)
+        parse_untargeted_parameter(input_item, all_nodes=True)
         for input_item in cli_args.parameters_all
     )
 
@@ -101,32 +99,43 @@ def _deprecated(message: str) -> None:
 _NODE_ATTR_MAP = {"id": "id", "label": "label", "taskid": "task_identifier"}
 
 
-def parse_parameter(
-    input_item: str, node_attr: Optional[str] = None, all_nodes: Optional[bool] = None
-) -> dict:
-    """The format of `input_item` is `"[NODE:]NAME=VALUE"`."""
+def parse_targeted_parameter(input_item: str, node_attr: str) -> dict:
+    """Parse `NODE:NAME=VALUE`."""
 
-    node_and_name, _, value = input_item.partition("=")
-    a, sep, b = node_and_name.partition(":")
+    node_and_var_name, _, var_value = input_item.partition("=")
+    node, sep, var_name = node_and_var_name.partition(":")
+
+    if not sep:
+        raise ValueError(f"{input_item} needs a target NODE:{input_item}")
+
+    return {
+        _NODE_ATTR_MAP[node_attr]: node,
+        "name": var_name,
+        "value": parse_value(var_value),
+    }
+
+
+def parse_untargeted_parameter(input_item: str, all_nodes: bool) -> dict:
+    """Parse `NAME=VALUE`."""
+
+    var_name, _, var_value = input_item.partition("=")
+    _, sep, _ = var_name.partition(":")
 
     if sep:
-        node = a
-        var_name = b
-    else:
-        node = None
-        var_name = a
+        raise ValueError(f"{input_item} does not accept a target node")
 
-    var_value = parse_value(value)
+    return {
+        "all": all_nodes,
+        "name": var_name,
+        "value": parse_value(var_value),
+    }
 
-    if node is None:
-        if all_nodes is None:
-            raise ValueError(f"{input_item} needs a target NODE:{input_item}")
-        return {"all": all_nodes, "name": var_name, "value": var_value}
 
-    if node_attr is None and node is not None:
-        raise ValueError(f"{input_item} does not need the target '{node}'")
-
-    return {_NODE_ATTR_MAP[node_attr]: node, "name": var_name, "value": var_value}
+def parameter_has_target(input_item: str) -> bool:
+    """Check whether `"[NODE]:name=value"` has a target NODE."""
+    node_and_var_name, _, _ = input_item.partition("=")
+    _, sep, _ = node_and_var_name.partition(":")
+    return bool(sep)
 
 
 def parse_option(option: str) -> Tuple[str, Any]:

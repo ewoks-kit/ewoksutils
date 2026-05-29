@@ -95,7 +95,7 @@ def test_cli_execute_unexpected_parameter_target(cli_interface, argument):
         "node1:a=1",  # This has un unexpected target
     ]
 
-    with pytest.raises(ValueError, match="node1:a=1 does not need the target 'node1'"):
+    with pytest.raises(ValueError, match="node1:a=1 does not accept a target"):
         _ = cli_interface(
             argv,
             cli_execute_utils.execute_arguments,
