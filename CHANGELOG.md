@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Introduced explicit CLI parameter addressing for workflow inputs:
+  - `-pn / --parameter-nodeid` for inputs targeting a specific node id
+  - `-pt / --parameter-taskid` for inputs targeting a specific task identifier
+  - `-pl / --parameter-label` for for inputs targeting a specific node label
+  - `-ps / --parameter-start` for inputs targeting all start nodes
+  - `-pa / --parameter-all` for inputs targeting all nodes
+
+### Deprecated
+
+- CLI parameter `-p / --parameter` is deprecated and will be removed in a future release.
+  - Replace with `-pn`, `-pt`, or `-pl` to target specific nodes.
+  - Replace with `-ps` or `-pa` to target start or all nodes respectively.
+- `--input-node-id` is deprecated in favor of explicit arguments (`-pn`, `-pt`, `-pl`)
+- `--inputs` is deprecated in favor of explicit scoping arguments
+  `-ps` or `-pa` for start or all nodes respectively.
+
 ## [1.9.2] - 2025-12-29
 
 ### Changed
