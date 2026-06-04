@@ -1,6 +1,4 @@
-"""Task-related exceptions for the Ewoks ecosystem."""
-
-__all__ = ["TaskError", "TaskExecutionError", "TaskInputError"]
+"""Task-related exceptions."""
 
 
 class TaskError(Exception):
@@ -16,11 +14,11 @@ class TaskError(Exception):
 class TaskExecutionError(TaskError, RuntimeError):
     """Raised when a task fails during execution.
 
-    This exception is raised when the task's ``run()`` method or
+    This exception is raised when the task's `run()` method or
     any code executed during task processing raises an exception.
 
-    Multiple inheritance from ``RuntimeError`` ensures backward
-    compatibility with code that catches ``RuntimeError`` during
+    Multiple inheritance from `RuntimeError` ensures backward
+    compatibility with code that catches `RuntimeError` during
     task execution.
     """
 
@@ -35,8 +33,8 @@ class TaskInputError(TaskError, ValueError):
     - Input values fail validation
     - Input types are incorrect
 
-    Multiple inheritance from ``ValueError`` ensures backward
-    compatibility with code that catches ``ValueError`` during
+    Multiple inheritance from `ValueError` ensures backward
+    compatibility with code that catches `ValueError` during
     task instantiation.
     """
 
