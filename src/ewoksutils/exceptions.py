@@ -39,3 +39,28 @@ class TaskInputError(TaskError, ValueError):
     """
 
     pass
+
+
+class TaskWarning(UserWarning):
+    """Base warning for all task-related warnings.
+
+    This warning should not be raised directly. Use one of the
+    more specific warnings below.
+    """
+
+    pass
+
+
+class TaskInputWarning(TaskWarning):
+    """Raised when task inputs have issues that do not prevent execution.
+
+    This warning is raised when:
+    - Input values are deprecated
+    - Input types will change in future versions
+    - Input values have non-critical issues
+
+    Inherits from `TaskWarning` to allow catching all task-related
+    warnings together.
+    """
+
+    pass
