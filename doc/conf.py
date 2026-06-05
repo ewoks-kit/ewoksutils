@@ -66,6 +66,10 @@ html_theme_options = {
     "logo": {
         "text": docstitle,
     },
+    "navbar_start": [
+        "navbar-logo",
+        "navbar-ewoks-logo",
+    ],
     "footer_start": ["copyright"],
     "footer_end": ["footer_end"],
 }
