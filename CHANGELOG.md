@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-06-08
+
 ### Added
 
 - Introduced explicit CLI parameter addressing for workflow inputs:
@@ -15,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `-pl / --parameter-label` for for inputs targeting a specific node label
   - `-ps / --parameter-start` for inputs targeting all start nodes
   - `-pa / --parameter-all` for inputs targeting all nodes
+- `ewoksutils.exceptions`: common ewoks exceptions and warnings.
 
 ### Deprecated
 
@@ -25,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--inputs` is deprecated in favor of explicit scoping arguments
   `-ps` or `-pa` for start or all nodes respectively.
 
-## [1.9.2] - 2025-12-29
+## [1.9.2] - 2026-03-05
 
 ### Changed
 
@@ -148,7 +151,8 @@ Project migrated to https://github.com/ewoks-kit/ewoksutils.
 - Ewoks event definition.
 - Import utilities.
 
-[unreleased]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.2...HEAD
+[unreleased]: https://github.com/ewoks-kit/ewoksutils/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.2...v1.10.0
 [1.9.2]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/ewoks-kit/ewoksutils/compare/v1.8.1...v1.9.0
