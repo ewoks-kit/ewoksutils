@@ -65,7 +65,7 @@ html_theme_options = {
         {
             "name": "ewoks",
             "url": "https://ewoks.readthedocs.io/en/stable",
-            "icon": "_static/ewoks-logo.svg",  # This svg contains dark / light mode information
+            "icon": "https://gitlab.esrf.fr/workflow/ewoksadmin/ewoksdoc/-/raw/main/logos/ewoks_for_sphinx_theme.svg",  # This svg contains dark / light mode information
             "type": "local",
         },
     ],
