@@ -33,9 +33,7 @@ test = [
 ]
 dev = [
     "ewoksutils[test]",
-    "black >=25",
-    "flake8 >=4",
-    "isort",
+    "ruff",
 ]
 doc = [
     "sphinx >=4.5",
@@ -57,6 +55,13 @@ omit = ["*/tests/*"]
 module = "setuptools.*"
 ignore_missing_imports = true
 
-[tool.isort]
-profile = "black"
-force_single_line = true
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore `S101` (assert used violations) in all test files
+"src/ewoks/tests/*.py" = ["S101"]
+
+[tool.ruff.lint.isort]
+force-single-line = true

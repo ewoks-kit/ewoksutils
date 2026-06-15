@@ -51,8 +51,7 @@ def parse_ewoks_inputs_parameters(cli_args: Namespace) -> List[dict]:
             replacement = inputs_replacement[cli_args.inputs]
 
             _deprecated(
-                f"--inputs={cli_args.inputs} is deprecated; "
-                f"use {replacement} instead."
+                f"--inputs={cli_args.inputs} is deprecated; use {replacement} instead."
             )
 
         all_nodes = cli_args.inputs == "all"

@@ -2,7 +2,6 @@ import sys
 import warnings
 
 if sys.version_info < (3, 13):
-
     from functools import wraps
 
     def deprecated(message: str):
