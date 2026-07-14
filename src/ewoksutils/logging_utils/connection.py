@@ -66,10 +66,9 @@ class ConnectionHandler(logging.Handler):
         return False
 
     def handleError(self, record):
-        if self.closeOnError and self._connected():
+        if self._disconnect_on_error and self._connected():
             self._disconnect()
-        else:
-            super().handleError(record)
+        super().handleError(record)
 
     def emit(self, record):
         try:
