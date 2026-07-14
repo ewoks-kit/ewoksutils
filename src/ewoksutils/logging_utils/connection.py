@@ -4,23 +4,30 @@ from typing import Any
 
 
 class ConnectionHandler(logging.Handler):
-    """A python handler with a generic underlying connection. The
-    only requirement is that the connection closes itself on garbage collection.
+    """A python handler with a generic underlying connection. The only
+    requirements are that the connection closes itself on garbage
+    collection and that the connection handles timeouts natively.
     """
 
-    def __init__(self):
+    def __init__(self, disconnect_on_error: bool = False):
+        """
+        :param disconnect_on_error: disconnect when emitting a record failed
+        """
         super().__init__()
-        self._connection = None
-        self.closeOnError = False
+        self._disconnect_on_error = disconnect_on_error
 
     @abstractmethod
-    def _connect(self, timeout=1) -> None:
+    def _connect(self) -> None:
         """This is called when no connection exists."""
         pass
 
     @abstractmethod
     def _disconnect(self) -> None:
         """This is called when a connection exists and is connected."""
+        pass
+
+    @abstractmethod
+    def _connected(self) -> bool:
         pass
 
     @abstractmethod
@@ -32,9 +39,6 @@ class ConnectionHandler(logging.Handler):
     def _send_serialized_record(self, srecord: Any):
         """Send the output from `_serialize_record` to the connection."""
         pass
-
-    def _connected(self) -> bool:
-        return self._connection is not None
 
     def handleError(self, record):
         if self._disconnect_on_error and self._connected():
