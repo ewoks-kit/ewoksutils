@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0rc1] - 2026-07-16
+
 ### Added
 
 - `ConnectionHandler`: add `disconnect_on_error` arguments.
@@ -160,7 +162,8 @@ Project migrated to https://github.com/ewoks-kit/ewoksutils.
 - Ewoks event definition.
 - Import utilities.
 
-[unreleased]: https://github.com/ewoks-kit/ewoksutils/compare/v1.10.0...HEAD
+[unreleased]: https://github.com/ewoks-kit/ewoksutils/compare/v2.0.0rc1...HEAD
+[2.0.0rc1]: https://github.com/ewoks-kit/ewoksutils/compare/v1.10.0...v2.0.0rc1
 [1.10.0]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.2...v1.10.0
 [1.9.2]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/ewoks-kit/ewoksutils/compare/v1.9.0...v1.9.1
