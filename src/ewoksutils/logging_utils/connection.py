@@ -1,34 +1,33 @@
 import logging
-import time
 from abc import abstractmethod
 from typing import Any
 
 
 class ConnectionHandler(logging.Handler):
-    """A python handler with a generic underlying connection. The
-    only requirement is that the connection closes itself on garbage collection.
+    """A python handler with a generic underlying connection. The only
+    requirements are that the connection closes itself on garbage
+    collection and that the connection handles timeouts natively.
     """
 
-    def __init__(self):
+    def __init__(self, disconnect_on_error: bool = False):
+        """
+        :param disconnect_on_error: disconnect when emitting a record failed
+        """
         super().__init__()
-        self._connection = None
-        self.closeOnError = False
-        self._retry_time = None
-        #
-        # Exponential backoff parameters.
-        #
-        self._retry_start = 1.0
-        self._retry_max = 30.0
-        self._retry_factor = 2.0
+        self._disconnect_on_error = disconnect_on_error
 
     @abstractmethod
-    def _connect(self, timeout=1) -> None:
+    def _connect(self) -> None:
         """This is called when no connection exists."""
         pass
 
     @abstractmethod
     def _disconnect(self) -> None:
         """This is called when a connection exists and is connected."""
+        pass
+
+    @abstractmethod
+    def _connected(self) -> bool:
         pass
 
     @abstractmethod
@@ -41,41 +40,17 @@ class ConnectionHandler(logging.Handler):
         """Send the output from `_serialize_record` to the connection."""
         pass
 
-    def _connected(self) -> bool:
-        return self._connection is not None
-
-    def _ensure_connection(self) -> bool:
-        if self._connected():
-            return True
-        now = time.time()
-        if self._retry_time is not None and now < self._retry_time:
-            return False
-        self._connect()
-        if self._connected():
-            # Connection succeeded: no delay for next connection attempt
-            self._retry_time = None
-            return True
-        # Connection failed: no next connection attempt before _retry_time
-        if self._retry_time is None:
-            self._retry_period = self._retry_start
-        else:
-            self._retry_period = self._retry_period * self._retry_factor
-            if self._retry_period > self._retry_max:
-                self._retry_period = self._retry_max
-        self._retry_time = now + self._retry_period
-        return False
-
     def handleError(self, record):
-        if self.closeOnError and self._connected():
+        if self._disconnect_on_error and self._connected():
             self._disconnect()
-        else:
-            super().handleError(record)
+        super().handleError(record)
 
     def emit(self, record):
         try:
-            if self._ensure_connection():
-                s = self._serialize_record(record)
-                self._send_serialized_record(s)
+            if not self._connected():
+                self._connect()
+            s = self._serialize_record(record)
+            self._send_serialized_record(s)
         except Exception:
             self.handleError(record)
 

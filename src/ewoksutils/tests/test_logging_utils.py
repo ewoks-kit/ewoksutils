@@ -40,12 +40,19 @@ def test_connection_handler():
             connected = False
 
     class MyHandler(ConnectionHandler):
-        def _connect(self, timeout=1) -> None:
+        def __init__(self, disconnect_on_error: bool = False):
+            super().__init__(disconnect_on_error=disconnect_on_error)
+            self._connection = None
+
+        def _connect(self) -> None:
             self._connection = Connection()
 
         def _disconnect(self) -> None:
             del self._connection
             self._connection = None
+
+        def _connected(self) -> bool:
+            return self._connection is not None
 
         def _send_serialized_record(self, srecord):
             destination.append(srecord)

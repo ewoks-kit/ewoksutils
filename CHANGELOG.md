@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `ConnectionHandler`: add `disconnect_on_error` arguments.
+- `Sqlite3Handler`: add `disconnect_on_error` and `timeout` arguments.
+
+### Changed
+
+- `ConnectionHandler` `_connected()` method is now abstract
+
 ## [1.10.0] - 2026-07-01
 
 ### Added
