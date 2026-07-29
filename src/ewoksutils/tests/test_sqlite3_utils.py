@@ -1,5 +1,7 @@
 import datetime
 
+import pytest
+
 from .. import sqlite3_utils
 
 
@@ -134,3 +136,52 @@ def test_sqlite3_types():
             )
         )
         assert len(rows) == 0
+
+
+def test_sqlite3_select_value_is_not_sql_injectable():
+    """A filter value that looks like SQL must be treated as literal data,
+    not executable SQL (values are passed as parameters, not interpolated)."""
+    field_types = {"name": ""}
+    sql_types = sqlite3_utils.python_to_sql_types(field_types)
+
+    with sqlite3_utils.connect(":memory:") as conn:
+        conn.execute(sqlite3_utils.ensure_table_query("test", sql_types))
+        conn.commit()
+
+        insert_query = sqlite3_utils.insert_query("test", len(field_types))
+        conn.execute(
+            insert_query, [sqlite3_utils.serialize("alice", sql_types["name"])]
+        )
+        conn.commit()
+
+        malicious = "x' OR '1'='1"
+        rows = list(
+            sqlite3_utils.select(
+                conn,
+                "test",
+                field_types=field_types,
+                sql_types=sql_types,
+                name=malicious,
+            )
+        )
+        assert rows == []
+
+        # The table must still exist and be queryable normally afterwards.
+        rows = list(
+            sqlite3_utils.select(
+                conn, "test", field_types=field_types, sql_types=sql_types, name="alice"
+            )
+        )
+        assert rows == [{"name": "alice"}]
+
+
+def test_sqlite3_select_rejects_invalid_table_name():
+    with sqlite3_utils.connect(":memory:") as conn:
+        with pytest.raises(ValueError):
+            list(sqlite3_utils.select(conn, "test; DROP TABLE test; --"))
+
+
+def test_sqlite3_select_rejects_invalid_filter_key():
+    with sqlite3_utils.connect(":memory:") as conn:
+        with pytest.raises(ValueError):
+            list(sqlite3_utils.select(conn, "test", **{"bad name; --": "value"}))

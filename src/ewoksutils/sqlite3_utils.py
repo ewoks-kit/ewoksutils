@@ -1,4 +1,5 @@
 import json
+import re
 import sqlite3
 from contextlib import closing
 from contextlib import contextmanager
@@ -60,13 +61,6 @@ def serialize(value: Any, sql_type: Optional[str] = None):
         return json.dumps(value).encode()
 
 
-def _select_serialize(value: Any, sql_type: Optional[str] = None):
-    sql_value = serialize(value, sql_type)
-    if isinstance(sql_value, str):
-        return f"'{sql_value}'"
-    return sql_value
-
-
 def deserialize(sql_value, field_type: Optional[str] = None):
     if isinstance(sql_value, bytes):
         sql_value = sql_value.decode()
@@ -91,35 +85,39 @@ def select(
     endtime: Optional[Union[str, datetime]] = None,
     **is_equal_filter,
 ) -> Iterator[dict]:
+    table = _validate_identifier(table)
+    conditions = []
+    params = []
+
     if is_equal_filter:
         if sql_types is None:
             sql_types = python_to_sql_types(field_types)
-        conditions = [
-            f"{k} = {_select_serialize(v, sql_types.get(k))}"
-            for k, v in is_equal_filter.items()
-        ]
-    else:
-        conditions = list()
+        for k, v in is_equal_filter.items():
+            conditions.append(f"{_validate_identifier(k)} = ?")
+            params.append(serialize(v, sql_types.get(k)))
 
     if starttime:
         if isinstance(starttime, str):
             starttime = fromisoformat(starttime)
-        conditions.append(f"time >= '{starttime.isoformat()}'")
+        conditions.append("time >= ?")
+        params.append(starttime.isoformat())
 
     if endtime:
         if isinstance(endtime, str):
             endtime = fromisoformat(endtime)
-        conditions.append(f"time <= '{endtime.isoformat()}'")
+        conditions.append("time <= ?")
+        params.append(endtime.isoformat())
 
     if conditions:
         search_condition = " AND ".join(conditions)
-        query = f"SELECT * FROM {table} WHERE {search_condition}"
+        # table/columns are validated by _validate_identifier(); values are parameterized
+        query = f"SELECT * FROM {table} WHERE {search_condition}"  # noqa: S608
     else:
-        query = f"SELECT * FROM {table}"
+        query = f"SELECT * FROM {table}"  # noqa: S608
 
     with closing(conn.cursor()) as cursor:
         try:
-            cursor.execute(query)
+            cursor.execute(query, params)
         except sqlite3.OperationalError as e:
             if "no such table" in str(e):
                 return
@@ -154,3 +152,14 @@ def _ensure_directory_exists(uri: str) -> None:
     if parsed.scheme == "file":
         path = uri_utils.path_from_uri(uri)
         path.parent.mkdir(parents=True, exist_ok=True)
+
+
+# Table/column names cannot be parameterized in DBAPI queries, so restrict
+# them to simple identifiers before interpolating them into SQL strings.
+_IDENTIFIER_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _validate_identifier(name: str) -> str:
+    if not _IDENTIFIER_RE.match(name):
+        raise ValueError(f"{name!r} is not a valid SQL identifier")
+    return name

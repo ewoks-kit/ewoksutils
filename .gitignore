@@ -2,7 +2,6 @@
 .*
 !.gitignore
 !.readthedocs.yaml
-!.flake8
 !.github
 
 # Byte / compiled / optimized
