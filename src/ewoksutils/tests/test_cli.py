@@ -5,13 +5,14 @@ from ..cli_utils import cli_execute_utils
 from ..cli_utils import cli_submit_utils
 
 
-def test_cli_execute_no_parameters(cli_interface):
+def test_cli_execute_no_parameters(cli_interface, tmp_path):
+    workflow_dir = str(tmp_path)
     argv = [
         "acyclic1",
         "acyclic2",
         "--test",
         "--workflow-dir",
-        "/tmp",
+        workflow_dir,
     ]
     cli_args = cli_interface(
         argv,
@@ -27,7 +28,7 @@ def test_cli_execute_no_parameters(cli_interface):
         "outputs": [],
         "task_options": {},
         "varinfo": {"root_uri": "", "scheme": "nexus"},
-        "load_options": {"representation": "test_core", "root_dir": "/tmp"},
+        "load_options": {"representation": "test_core", "root_dir": workflow_dir},
         "execinfo": {},
     }
     assert cli_args.execute_options == execute_options
@@ -201,7 +202,8 @@ def test_cli_execute_deprecated_inputs_all(cli_interface):
     assert cli_args.execute_options == execute_options
 
 
-def test_cli_submit(cli_interface):
+def test_cli_submit(cli_interface, tmp_path):
+    workflow_dir = str(tmp_path)
     argv = [
         "acyclic1",
         "acyclic2",
@@ -211,7 +213,7 @@ def test_cli_submit(cli_interface):
         "-pn",
         "node1:b=test",
         "--workflow-dir",
-        "/tmp",
+        workflow_dir,
         "--wait=inf",
     ]
     cli_args = cli_interface(
@@ -231,7 +233,7 @@ def test_cli_submit(cli_interface):
         "outputs": [],
         "task_options": {},
         "varinfo": {"root_uri": "", "scheme": "nexus"},
-        "load_options": {"representation": "test_core", "root_dir": "/tmp"},
+        "load_options": {"representation": "test_core", "root_dir": workflow_dir},
         "execinfo": {},
     }
     assert cli_args.execute_options == execute_options
