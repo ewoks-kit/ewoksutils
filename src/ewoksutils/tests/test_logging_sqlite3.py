@@ -2,11 +2,24 @@ import logging
 import sqlite3
 import threading
 import time
+from typing import Optional
 
 from .. import sqlite3_utils
 from ..logging_utils.sqlite3 import Sqlite3Handler
 
 FIELD_TYPES = {"field1": 0, "field2": ""}
+
+
+def _sqlite3_retry_period() -> Optional[float]:
+    """Sqlite3Handler's native busy timeout blocks without yielding, which
+    can deadlock a cooperative event loop (e.g. gevent) when the lock holder
+    runs in another greenlet. Retry at the python level instead in that case.
+    """
+    try:
+        from gevent.monkey import is_module_patched
+    except ImportError:
+        return None
+    return 0.1 if is_module_patched("threading") else None
 
 
 def test_concurrent_read_write(tmp_path):
@@ -66,14 +79,16 @@ def test_concurrent_read_write(tmp_path):
 
 def test_write_blocked_by_reader(tmp_path):
     """A writer must wait for read locks to be released."""
+    retry_period = _sqlite3_retry_period()
     lock_seconds = 0.5
-    retry_period = lock_seconds / 5  # do not retry long enough
-    retry_timeout = 5 * lock_seconds  # retry long enough
+    short_timeout = lock_seconds / 5  # do not retry long enough
+    long_timeout = 5 * lock_seconds  # retry long enough
 
     # Add record to the database
     uri = str(tmp_path / "test.db")
-    handler = Sqlite3Handler(uri, "mytable", FIELD_TYPES)
+    handler = Sqlite3Handler(uri, "mytable", FIELD_TYPES, retry_period=retry_period)
     handler.handle(_make_record(field1=1))
+    handler.close()
 
     # Reader
     read_lock_acquired = threading.Event()
@@ -99,7 +114,9 @@ def test_write_blocked_by_reader(tmp_path):
     thread = threading.Thread(target=read_lock_database)
     thread.start()
 
-    handler = Sqlite3Handler(uri, "mytable", FIELD_TYPES, timeout=retry_period)
+    handler = Sqlite3Handler(
+        uri, "mytable", FIELD_TYPES, timeout=short_timeout, retry_period=retry_period
+    )
     try:
         assert read_lock_acquired.wait(timeout=10)
         handler.handle(_make_record(field1=2))
@@ -112,7 +129,9 @@ def test_write_blocked_by_reader(tmp_path):
     thread = threading.Thread(target=read_lock_database)
     thread.start()
 
-    handler = Sqlite3Handler(uri, "mytable", FIELD_TYPES, timeout=retry_timeout)
+    handler = Sqlite3Handler(
+        uri, "mytable", FIELD_TYPES, timeout=long_timeout, retry_period=retry_period
+    )
     try:
         assert read_lock_acquired.wait(timeout=10)
         # Write while the reader locks

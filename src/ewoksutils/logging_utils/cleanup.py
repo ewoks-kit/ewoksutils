@@ -49,8 +49,13 @@ def cleanup_handler(handler: logging.Handler) -> None:
         try:
             q = handler.queue
             if isinstance(q, queue.Queue):
-                with q.mutex:
+                # gevent's monkey-patched `queue.Queue` has no `mutex` attribute.
+                mutex = getattr(q, "mutex", None)
+                if mutex is None:
                     q.queue.clear()
+                else:
+                    with mutex:
+                        q.queue.clear()
         finally:
             handler.release()
     handler.close()
