@@ -1,4 +1,5 @@
 import sqlite3
+import time
 from typing import Any
 from typing import Dict
 from typing import List
@@ -19,6 +20,7 @@ class Sqlite3Handler(ConnectionHandler):
         field_types: Dict,
         timeout: float = 10,
         disconnect_on_error: bool = False,
+        retry_period: Optional[float] = None,
     ):
         """
         :param uri: for example "file:/path/to/test.db" or "file:///path/to/test.db".
@@ -26,14 +28,18 @@ class Sqlite3Handler(ConnectionHandler):
                       (the table is created when missing).
         :param field_types: mapping from record attribute names (table columns)
                             to python types.
-        :param timeout: native sqlite3 busy timeout: the maximum time to wait
-                        for database locks to be released by other connections.
-                        A record is dropped when the timeout is reached.
+        :param timeout: maximum time to wait for database locks to be released
+                        by other connections. A record is dropped when the
+                        timeout is reached.
         :param disconnect_on_error: disconnect when emitting a record failed.
+        :param retry_period: when `None` (default), `timeout` is used as sqlite3's
+                        native busy timeout. When set, retrying is done at the
+                        python level instead.
         """
         super().__init__(disconnect_on_error=disconnect_on_error)
         self._uri = uri
         self._timeout = timeout
+        self._retry_period = retry_period
         self._field_sql_types = sqlite3_utils.python_to_sql_types(field_types)
 
         self._ensure_table_query = sqlite3_utils.ensure_table_query(
@@ -47,8 +53,15 @@ class Sqlite3Handler(ConnectionHandler):
         self._connection_context = None
 
     def _connect(self) -> None:
+        if self._retry_period is None:
+            native_timeout = self._timeout
+        else:
+            native_timeout = min(self._timeout, self._retry_period)
         ctx = sqlite3_utils.connect(
-            self._uri, timeout=self._timeout, uri=True, check_same_thread=False
+            self._uri,
+            timeout=native_timeout,
+            uri=True,
+            check_same_thread=False,
         )
         try:
             conn = ctx.__enter__()
@@ -88,6 +101,17 @@ class Sqlite3Handler(ConnectionHandler):
     ) -> None:
         if conn is None:
             conn = self._connection
+        if conn is None:
+            raise RuntimeError("Sqlite3Handler is not connected")
+        if self._retry_period is None:
+            self._sql_query_single_attempt(sql, parameters, conn)
+        else:
+            self._sql_query_with_retries(sql, parameters, conn, self._retry_period)
+
+    @staticmethod
+    def _sql_query_single_attempt(
+        sql: str, parameters: Sequence, conn: sqlite3.Connection
+    ) -> None:
         try:
             conn.execute(sql, parameters)
             conn.commit()
@@ -98,3 +122,41 @@ class Sqlite3Handler(ConnectionHandler):
             except sqlite3.OperationalError:
                 pass
             raise
+
+    def _sql_query_with_retries(
+        self,
+        sql: str,
+        parameters: Sequence,
+        conn: sqlite3.Connection,
+        retry_period: float,
+    ) -> None:
+        start = time.time()
+        while True:
+            try:
+                conn.execute(sql, parameters)
+                conn.commit()
+                return
+            except BaseException as ex:
+                # Do not leave the failed query pending in an open transaction.
+                try:
+                    conn.rollback()
+                except sqlite3.OperationalError:
+                    pass
+
+                # retry when certain exceptions
+                do_retry = self._retry_sqlite3_exception(ex)
+                if do_retry and time.time() - start < self._timeout:
+                    time.sleep(retry_period)
+                    continue
+
+                raise
+
+    @staticmethod
+    def _retry_sqlite3_exception(ex: BaseException) -> bool:
+        if not isinstance(ex, sqlite3.OperationalError):
+            return False
+        error_message = str(ex)
+        if "database is locked" in error_message:
+            # transient lock by another connection.
+            return True
+        return False

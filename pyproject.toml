@@ -30,6 +30,7 @@ full = [
 test = [
     "ewoksutils[full]",
     "pytest >=7",
+    "gevent",
 ]
 dev = [
     "ewoksutils[test]",

@@ -64,6 +64,19 @@ jobs:
             python-version: "3.9"
             enable-coverage: "false"
 
+  test-3-12-gevent:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      JUPYTER_PLATFORM_DIRS: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ewoks-kit/.github/.github/actions/setup-python-package@main
+        with:
+          python-version: "3.12"
+          install-extras: "test"
+      - run: python -m gevent.monkey --module pytest . -v -ra -W error
+
   # Run linter / checks
   checks:
     uses: ewoks-kit/.github/.github/workflows/python-check.yml@main
