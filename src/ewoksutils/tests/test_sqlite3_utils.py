@@ -185,3 +185,28 @@ def test_sqlite3_select_rejects_invalid_filter_key():
     with sqlite3_utils.connect(":memory:") as conn:
         with pytest.raises(ValueError):
             list(sqlite3_utils.select(conn, "test", **{"bad name; --": "value"}))
+
+
+def test_ensure_table_query_rejects_invalid_table():
+    with pytest.raises(ValueError):
+        sqlite3_utils.ensure_table_query("foo; DROP TABLE bar; --", {"id": "INTEGER"})
+
+
+def test_ensure_table_query_rejects_invalid_column():
+    with pytest.raises(ValueError):
+        sqlite3_utils.ensure_table_query("foo", {"id; DROP TABLE bar; --": "INTEGER"})
+
+
+def test_ensure_table_query_rejects_invalid_sql_type():
+    with pytest.raises(ValueError):
+        sqlite3_utils.ensure_table_query("foo", {"id": "INTEGER); DROP TABLE bar; --"})
+
+
+def test_ensure_table_query_accepts_supported_types():
+    assert (
+        sqlite3_utils.ensure_table_query(
+            "foo",
+            {"id": "INTEGER", "name": "TEXT"},
+        )
+        == "CREATE TABLE IF NOT EXISTS foo (id INTEGER, name TEXT)"
+    )
