@@ -12,6 +12,9 @@ def add_click_options(args_list: List[CLIArg]):
     Decorator factory that adds Click arguments/options from a list of CLIArg objects.
 
     Example:
+
+    .. code-block:: python
+
         @click.command("mycommand")
         @add_click_options([...])
         def mycommand(cli_args: Namespace):
