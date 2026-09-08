@@ -1,6 +1,5 @@
 import json
 import re
-import sqlite3
 from contextlib import closing
 from contextlib import contextmanager
 from datetime import datetime
@@ -12,6 +11,17 @@ from typing import Generator
 from typing import Iterator
 from typing import Optional
 from typing import Union
+
+try:
+    import sqlite3
+except ImportError as exc:
+    raise ImportError(
+        "Python's sqlite3 module is required but is not available. "
+        "This usually means that the Python interpreter was built without SQLite "
+        "support. Install the SQLite development libraries required by your "
+        "operating system, then reinstall or rebuild Python and recreate the "
+        "virtual environment."
+    ) from exc
 
 from . import uri_utils
 from .datetime_utils import fromisoformat

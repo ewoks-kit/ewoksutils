@@ -1,4 +1,3 @@
-import sqlite3
 import time
 from typing import Any
 from typing import Dict
@@ -7,6 +6,7 @@ from typing import Optional
 from typing import Sequence
 
 from .. import sqlite3_utils
+from ..sqlite3_utils import sqlite3
 from .connection import ConnectionHandler
 
 Sqlite3RecordType = List[Any]

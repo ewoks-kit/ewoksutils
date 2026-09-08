@@ -1,11 +1,11 @@
 import logging
-import sqlite3
 import threading
 import time
 from typing import Optional
 
 from .. import sqlite3_utils
 from ..logging_utils.sqlite3 import Sqlite3Handler
+from ..sqlite3_utils import sqlite3
 
 FIELD_TYPES = {"field1": 0, "field2": ""}
 
