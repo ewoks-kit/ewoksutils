@@ -9,4 +9,5 @@ of the `European Synchrotron <https://www.esrf.fr/>`_.
 .. toctree::
     :hidden:
 
+    howtoguides
     reference
