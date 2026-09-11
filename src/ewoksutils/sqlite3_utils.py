@@ -26,17 +26,30 @@ except ImportError as exc:
 from . import uri_utils
 from .datetime_utils import fromisoformat
 
+_SQL_TYPES = {"INTEGER", "REAL", "TEXT", "BLOB"}
+
 
 def ensure_table_query(table: str, field_sql_types: Dict[str, str]) -> str:
+    table = _validate_identifier(table)
+
     s = f"CREATE TABLE IF NOT EXISTS {table}"
     if not field_sql_types:
         return s
-    lst = [f"{k} {v}" for k, v in field_sql_types.items()]
+
+    lst = []
+    for field, sql_type in field_sql_types.items():
+        field = _validate_identifier(field)
+        sql_type = sql_type.upper()
+        if sql_type not in _SQL_TYPES:
+            raise ValueError(f"{sql_type!r} is not a supported SQL type")
+        lst.append(f"{field} {sql_type}")
+
     columns = ", ".join(lst)
     return f"{s} ({columns})"
 
 
-def insert_query(table: str, nfields: int):
+def insert_query(table: str, nfields: int) -> str:
+    table = _validate_identifier(table)
     values = ("?," * nfields)[:-1]
     return f"INSERT INTO {table} VALUES({values})"
 
