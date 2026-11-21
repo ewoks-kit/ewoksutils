@@ -8,6 +8,9 @@ from json.decoder import JSONDecodeError
 from typing import Any
 from typing import List
 from typing import Tuple
+from typing import Union
+
+from ..task_utils import task_graph
 
 logger = logging.getLogger(__name__)
 
@@ -149,11 +152,13 @@ def parse_value(value: str) -> Any:
         return value
 
 
-def parse_workflows(cli_args: Namespace) -> Tuple[List[str], List[str]]:
+def parse_workflows(cli_args: Namespace) -> Tuple[List[str], List[Union[str, dict]]]:
     """
     :returns: workflows (possibly expanded due the search),
               graphs (execute graph arguments)
     """
+    if cli_args.task:
+        return cli_args.workflows, [task_graph(w) for w in cli_args.workflows]
     if not cli_args.search or cli_args.test:
         return cli_args.workflows, cli_args.workflows
 
