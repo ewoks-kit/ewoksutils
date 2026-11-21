@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `ewoksutils.task_utils`: add `task_graph` and `guess_task_type`.
+
 ## [2.0.0rc2] - 2026-08-02
 
 ### Added
