@@ -20,3 +20,9 @@ Use ``task_type`` to set it:
 .. code-block:: python
 
     graph = task_graph("mymodule.MyFunction", task_type="method")
+
+On the command line, use ``--task``:
+
+.. code-block:: bash
+
+    ewoks execute ewokscore.tests.examples.tasks.sumtask.SumTask --task -pa a=10 -pa b=20

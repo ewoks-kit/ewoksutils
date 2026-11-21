@@ -3,6 +3,7 @@ import pytest
 from ..cli_utils import cli_cancel_utils
 from ..cli_utils import cli_execute_utils
 from ..cli_utils import cli_submit_utils
+from ..task_utils import task_graph
 
 
 def test_cli_execute_no_parameters(cli_interface, tmp_path):
@@ -285,3 +286,21 @@ def test_cli_cancel(cli_interface):
     )
 
     assert list(cli_args.job_ids) == ["id1", "id2"]
+
+
+@pytest.mark.parametrize(
+    "arguments,parse_arguments",
+    [
+        (cli_execute_utils.execute_arguments, cli_execute_utils.parse_execute_argument),
+        (cli_submit_utils.submit_arguments, cli_submit_utils.parse_submit_arguments),
+    ],
+)
+def test_cli_task(cli_interface, arguments, parse_arguments):
+    argv = ["mymodule.myfunc", "--task", "-pa", "a=1"]
+    cli_args = cli_interface(argv, arguments, parse_arguments)
+
+    assert list(cli_args.workflows) == ["mymodule.myfunc"]
+    assert cli_args.graphs == [task_graph("mymodule.myfunc")]
+    assert cli_args.execute_options["inputs"] == [
+        {"all": True, "name": "a", "value": 1}
+    ]

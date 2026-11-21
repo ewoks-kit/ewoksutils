@@ -18,10 +18,17 @@ def workflow_arguments(action: str) -> List[CLIArg]:
             action="store_true",
         ),
         CLIArg(
+            "task",
+            ["--task"],
+            help="The 'workflow' argument is a task identifier. "
+            "The workflow has one node that executes this task.",
+            action="store_true",
+        ),
+        CLIArg(
             "search",
             ["--search"],
             help="The 'workflow' argument is a pattern to search for."
-            "Ignored when --test is provided.",
+            "Ignored when --test or --task is provided.",
             action="store_true",
         ),
         CLIArg(

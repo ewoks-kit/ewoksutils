@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `ewoksutils.task_utils`: add `task_graph` and `guess_task_type`.
+- CLI: add `--task` to execute a workflow with one task.
 
 ## [2.0.0rc2] - 2026-08-02
 
